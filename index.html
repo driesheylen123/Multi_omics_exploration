@@ -1,0 +1,420 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@hpcc-js/common/font-awesome/css/font-awesome.min.css">
+    <style>
+    body {
+        padding: 0px;
+        margin: 8px;
+        background: white;
+        color: black;
+    }
+    #placeholder {
+        position: absolute;
+        left: 8px;
+        top: 8px;
+        right: 8px;
+        bottom: 8px;
+        max-width: 480px;
+    }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@hpcc-js/observable-md/dist/index.full.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+        var omdMod = window["@hpcc-js/observable-md"]
+    </script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    
+
+
+</head>
+
+<body onresize="doResize()">
+    <div id="placeholder">
+    </div>
+    <div id="rect">
+    </div>
+    <script>
+
+        var svg = d3.select("#rect").append("svg").attr("width", 800).attr("height", 200)
+        
+        svg.append('rect')
+          .attr('x', 80)
+          .attr('y', 180)
+          .attr('width', 1)
+          .attr('height', 4)
+          .attr('stroke', 'black')
+          .attr('fill', 'transparent');
+
+      
+        var app = new omdMod.Observable()
+            .target("placeholder")
+            .showValues(true)
+            .mode("ojs")
+            .text(`md\`# Adjacency Matrix Brush, for cross-omics network visualization'
+\`
+
+md \`A major problem within network visualization is the occurance of hairball like graphs, from which no information at all can be extracted. This module allows to brush through the adjacency matrix of the network to visualize smaller sub-graphs of the network, allowing the user to gain more insight in specific parts of the network. The network visualization is a tweeked version of the [Force-Directed Graph](https://observablehq.com/@d3/force-directed-graph) by Mike Bostock. The data is protein correlation data\`
+
+viewof linkage = Select(["single", "complete", "average"], {value: "complete", label: "Linkage"})
+
+viewof reshuffle = Button("Reshuffle input.values");
+
+viewof type = Radio(types, {value: types[0] , label: "Clusters by: ", format: x => x.name})
+
+viewof threshold = Range([0, H.root[type.value] * 1.001], {value: max * 0.5, label: "Threshold: ", step: type.value == "depth" ? 1 : undefined});
+
+order = H.root.leaves().map(d => d.index);
+
+ordered_distance_matrix = order.map((oi, i) => order.map((oj, j) => [i, j, D.entry(oi, oj), oi, oj])).flat();
+
+///this is the postition where the input data is making a difference.
+
+X = {
+  reshuffle
+  return druid.Matrix.from(d3.shuffle(input));
+}
+
+
+Y = druid.UMAP.transform(X);
+
+D = druid.distance_matrix(X, druid.euclidean);
+
+
+circles = H.root.descendants();
+
+
+H = new druid.Hierarchical_Clustering(D, linkage, "precomputed");
+
+clusters = {
+  const H_clusters = H.get_clusters(threshold, type.name);
+  let I = Array.from({length: input.length});
+  
+  for (let cluster_index = 0; cluster_index < H_clusters.length; ++cluster_index) {
+    H_clusters[cluster_index].forEach(({index}) => I[index] = cluster_index)
+  }
+
+  return I
+}
+
+
+dendogram = {
+  const leaves = circles.filter(n => n.isLeaf);
+  const links = [];
+  
+  leaves.forEach((node, i) => node.x = i)
+  circles.forEach((node, i) => {
+    node.x = node.x ?? d3.mean(node.leaves(), d => d.x);
+    [node.left, node.right].forEach(child => {
+      if (child) {
+        links.push({
+          "source": node,
+          "target": child
+        })
+      }
+    })
+  })
+  return {
+    "nodes": circles,
+    "links": links,
+  }
+}
+  
+chart = {
+  
+  const matrixLayout = adjacencyMatrix()
+        .size([width/2 - margin,height-margin]);
+
+  const data = matrixLayout(labels, input);
+  let dataFiltered = data;
+
+
+  const svg = d3.create("svg").attr("width",width).attr("height",height);
+  const chart_adj = svg.append("g").attr("transform", \`translate(\${[margin/2,margin/2]})\`);
+  const chart_graph = svg.append("g").attr("transform", \`translate(\${[width/2.3 + margin/4, margin/2]})\`);
+  drawNetwork(data);
+  
+  const brush = d3.brush().on("brush end", detail);
+  
+  const innerChart = chart_adj.append('g').attr('class','innerChart');
+  const cell = innerChart
+          .selectAll("g.cell")
+          .data(data).join("g")
+          .attr("class", "cell")
+          .attr("transform", d => \`translate(\${[d.x,d.y]})\`);
+  
+  cell.append("rect")
+          .attr("height", d => d.h*.95)
+          .attr("width", d => d.w*.95)
+          .attr("rx",d => d.w/4)
+          .attr("ry", d => d.h/4)
+          .style('fill',d=> color(d.value))
+
+
+  chart_adj.append('g').attr('class', 'labels')
+          .selectAll('text.source')
+          .data(data.filter(d => d.x == 0))
+          .enter()
+          .append("text").attr("class",'source')
+          .attr("y", d => d.y + d.h/2)      // using d.y and d.h
+          .attr("x", -40)
+          .text((d,i) => labels[i]);
+
+  chart_adj.append('g').attr('class', 'labels')
+          .selectAll('text.target')
+          .data(data.filter(d => d.y == 0))
+          .enter()
+          .append("text").attr("class",'target')
+          .attr("x", d => d.x + d.w/2)          // using d.x and d.w
+          .attr("y", -10)
+          .style("font-size","3.5pt")
+          .text((d,i) => labels[i])
+          ;
+      
+          
+  // label rotation code (commented out at the moment)
+  //svg.selectAll('text.target')
+  //.attr('transform', d => 'translate(20,2), rotate(-100)')
+
+  chart_adj.selectAll("text")
+          .style("font-family", "Arial, sans-serif")
+          .style("text-anchor", "middle")
+          .style("alignment-baseline", "middle");
+          
+  
+  innerChart.call(brush);
+  
+  // Brush
+  function detail({selection}) {
+    if (selection) { 
+      const [[x0, y0], [x1, y1]] = selection;
+      dataFiltered = data.filter(d => x0 <= d.x && d.x < x1 && y0 <= d.y && d.y < y1 || x0 <= (d.x + d.w) && d.x < x1 && y0 <= (d.y + d.h) && d.y < y1);
+      cell.filter(d => !(x0 <= d.x && d.x < x1 && y0 <= d.y && d.y < y1 || x0 <= (d.x + d.w) && d.x < x1 && y0 <= (d.y + d.h) && d.y < y1)).style("opacity", .3);
+      cell.filter(d => x0 <= d.x && d.x < x1 && y0 <= d.y && d.y < y1 || x0 <= (d.x + d.w) && d.x < x1 && y0 <= (d.y + d.h) && d.y < y1).style("opacity", 1);
+    } else { 
+      dataFiltered = data;
+      cell.style("opacity", 1);
+    }
+    drawNetwork(dataFiltered);
+  }
+
+  function drag(simulation) {    
+    function dragstarted(event) {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      event.subject.fx = event.subject.x;
+      event.subject.fy = event.subject.y;
+    }
+    
+    function dragged(event) {
+      event.subject.fx = event.x;
+      event.subject.fy = event.y;
+    }
+    
+    function dragended(event) {
+      if (!event.active) simulation.alphaTarget(0);
+      event.subject.fx = null;
+      event.subject.fy = null;
+    }
+    
+    return d3.drag()
+      .on("start", dragstarted)
+      .on("drag", dragged)
+      .on("end", dragended);
+  }
+  
+  
+  function drawNetwork(data) {
+    // clear svg
+    chart_graph.selectAll('g').remove();
+    // Transform data
+    const links_temp = data.filter(r => r.source);
+    const nodes_temp = data.map(d => d.source).concat(data.map(d => d.target)).filter((v, i, a) => a.indexOf(v) === i).filter(r => r);
+    let nodes_temp2 = [];
+    for (let i = 0; i < nodes_temp.length; i++) {
+      nodes_temp2.push({node: nodes_temp[i]});
+    }
+    const networkData = {nodes: nodes_temp2, links: links_temp}
+
+    const links = networkData.links.map(d => Object.create(d));
+    const nodes = networkData.nodes.map(d => Object.create(d));
+    
+    const sim = d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(links).id(d => d.node).distance(250))
+      .force("charge", d3.forceManyBody())
+      .force("center", d3.forceCenter(width/5 - margin/2, height/ 2 - margin/2));
+  
+    const link = chart_graph.append("g")
+        .selectAll("line")
+        .data(links)
+        .join("line")
+        .attr("stroke", d => color(d.value))
+        .attr("stroke-opacity", 0.5)
+        .attr("stroke-width", d => Math.sqrt(d.value*10));
+
+    const node = chart_graph.append("g")
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 1.5)
+      .selectAll("circle")
+      .data(nodes)
+      .join("circle")
+        .attr("r", 8)
+        .attr("fill", d3.color("#343434"))
+        .call(drag(sim));
+
+    node.append("title")
+        .text(d => d.node);
+
+    sim.on("tick", () => {
+      link
+          .attr("x1", d => d.source.x)
+          .attr("y1", d => d.source.y)
+          .attr("x2", d => d.target.x)
+          .attr("y2", d => d.target.y);
+
+      node
+          .attr("cx", d => d.x)
+          .attr("cy", d => d.y);
+    });
+    
+  }
+     
+  // Return SVG
+  return svg.node();
+  
+}
+
+md\`## Data\`
+
+input = d3.json("protein_network_correlation.json", function(data) {
+    console.log(data);
+});
+
+labels = ['4E-BP1',
+ '5-NT',
+ 'AARSD1',
+ 'ABHD14B',
+ 'ABL1',
+ 'ACAN',
+ 'ACE2',
+ 'ACP6',
+ 'ADA',
+ 'ADAM 22',
+ 'ADAM 23',
+ 'ADAM 8',
+ 'ADAM-TS 15',
+ 'ADAM-TS13',
+ 'ADGRE2',
+ 'ADGRG1',
+ 'ADGRG2',
+ 'ADM',
+ 'AGR2',
+ 'AGR3',
+ 'AGRP',
+ 'AHCY',
+ 'AIFM1',
+ 'AKT1S1',
+ 'ALCAM',
+ 'ALDH1A1',
+ 'ALDH3A1',
+ 'Alpha-2-MRAP',
+ 'Gene1',
+ 'Gene2',
+ 'Gene3',
+ 'Gene4',
+ 'Gene5',
+ 'Gene6',
+ 'Gene7',
+ 'Metabolite1',
+ 'Metabolite2',
+ 'Metabolite3',
+ 'Metabolite4',
+ 'Metabolite5',
+ 'Metabolite6',
+ 'Metabolite7']
+ 
+
+md \`## Functions\`
+
+
+
+color = d3.scaleDiverging()
+  .domain([-1, 0, 1])
+  .interpolator(d3.interpolateRdBu)
+
+console.log(color(-0,5))
+
+
+adjacencyMatrix = () => {
+  let w = 1, h = 1, value = 1;
+
+  function layout(nodes, sourceMatrix) {
+
+    const len = nodes.length;
+
+    const resultMatrix = [];
+    for(let s = 0; s < sourceMatrix.length; s++) {
+      for(let t = 0; t < sourceMatrix.length; t++) {
+        const v = +sourceMatrix[s][t];
+        const rect = {x: t * w/len, y: s * h/len, w: w/len, h: h/len};
+        const edge = {source: nodes[s], target: nodes[t], value: value = v};
+        resultMatrix.push(Object.assign(edge, rect));
+      }
+    }
+    return resultMatrix;
+  }
+
+  layout.size = function(array) {
+    return arguments.length ? (w = +array[0], h = +array[1], layout) : [w, h];
+  }
+
+  return layout;
+}
+
+import {Button, Select, Radio, Range} from "@observablehq/inputs"
+
+md\`## Constants\`
+
+width = 1800
+
+height = 600
+
+margin = 200
+
+size = 26
+
+druid = require("@saehrimnir/druidjs@=0.3.11")
+
+types = [{value: "dist", name: "distance"}, {value: "depth", name: "depth"}];
+
+max = d3.max(circles, node => node[type.value]);
+
+
+
+
+datasets = require("@saehrimnir/dataset")
+
+
+
+
+d3 = require("d3@v6")`)
+
+            ;
+            
+
+        doResize();
+
+        function doResize() {
+        if (app) {
+            app
+                .resize()
+                .lazyRender()
+                ;
+        }
+    }
+
+    </script>
+</body>
+
+</html>
