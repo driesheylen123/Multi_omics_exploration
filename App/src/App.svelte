@@ -1,14 +1,14 @@
 <script>
 	
 	import { csv } from 'd3';
-import { SvelteComponent } from 'svelte';
 	import Matrix from "./components/Matrix.svelte";
 	import Network from "./components/Network.svelte";
 	
-	let dataset = [];
+	let dataset;
 
 	csv('data/protein_network_correlation_big.csv').then(function(data) {
 		dataset = data;
+		console.log(dataset);
 	})
 		
 </script>
@@ -18,5 +18,7 @@ import { SvelteComponent } from 'svelte';
 	I think is due to the fact that labels are extracted in both Matrix.svelte and Network.Svelte .
 	Hence, I'd like to create an additional data engeneering component that can be imported in all visuals components  -->
 <h1>Network Brush</h1>
-<!-- <Matrix data={dataset} width={1000} height={800}/> -->
-<Network data={dataset} width={1000} height={800} threshold={0.3} radius={5}/>
+{#if dataset}
+	<!-- <Matrix data={dataset} width={1000} height={800}/> -->
+	<Network data={dataset} width={1000} height={800} threshold={0.3} radius={5} />
+{/if}
