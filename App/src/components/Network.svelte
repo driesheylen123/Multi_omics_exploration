@@ -1,8 +1,7 @@
 <script>
-    import { onMount } from 'svelte';
     import { getContext } from 'svelte';
-    import { forceSimulation, forceLink, forceManyBody, forceCollide, forceCenter } from 'd3';
-    import Node from './Node.svelte';
+    import { forceSimulation, forceLink, forceManyBody, forceCollide, forceCenter, select } from 'd3';
+    import { dragFunction } from '../drag.js'
 
     const {nodes, edges} = getContext('data');
     $: nodesCopy = $nodes;
@@ -13,10 +12,8 @@
     export let width = 1000;
     export let height = 800;
     export let radius = 4;
-    let svgHandler;
 
     const linkForce = forceLink().id(d => d.id);
-
     const simulation = forceSimulation()
         .alphaTarget(0.02)   
         .alphaDecay(0)
@@ -35,20 +32,41 @@
         linkForce.links(edgesCopy);
     }
 
-    
+
+    // Functions
+    function addCustomListeners(circle) {
+
+        return {
+            update(node) {
+                // Add the d3-drag eventListener to each circle element
+                select(circle).call(dragFunction(node, simulation))
+            }
+        }
+
+    }
 
 </script>
 
-<svg width={width} height={height} bind:this={svgHandler}>
+<svg width={width} height={height}>
     <g transform={`translate(${margin.left}, ${margin.top})`}>
         <g class="edges">
             {#each edgesCopy as link}
-                <line class='link' x1={link.source.x} y1={link.source.y} x2={link.target.x} y2={link.target.y} style="stroke-width:{link.value}" />
+                <line class='link' 
+                    x1={link.source.x} 
+                    y1={link.source.y} 
+                    x2={link.target.x} 
+                    y2={link.target.y} 
+                    style="stroke-width:{link.value}" />
             {/each}
         </g>
         <g class="nodes">
             {#each nodesCopy as node}
-                <Node radius={radius} node={node} svg={svgHandler} />
+                <circle class='node' 
+                use:addCustomListeners={node}
+                cx="{node.x}" 
+                cy="{node.y}" 
+                r={radius}
+                />         
             {/each}
         </g>
     </g>
@@ -56,11 +74,11 @@
 
 
 <style>
-    /* .node {
+    .node {
         fill: #000981ce;
         stroke: #fff;
         stroke-width: 1px;
-    } */
+    }
     .link {
         stroke: #cccccc;
         stroke-opacity: .6;
