@@ -2,18 +2,25 @@
     import { csv } from 'd3';
     import { setContext } from 'svelte';
     import { derived, writable } from 'svelte/store';
+    import { threshold } from '../stores.js'
 
-    const threshold = writable(.3);
     const dataset = writable([]);
 
-	csv('data/protein_network_correlation_big.csv').then(function(data) {
+	csv('data/protein_network_correlation_big.csv', function(row) {
+        // Data prep: each row is originally an object, but needs to be an array. 
+        // Hence, we extract all column values for each row and store these in an array.
+        // The first value contains the row name, so we remove this value.
+        let row_asArray = Object.values(row);
+        row_asArray.shift();    // 
+        return row_asArray;
+    }).then(function(data) {
+        // Remove empty column value
+        data.columns.shift();
 		$dataset = data;
 	});
 
     const labels = derived(dataset, ($dataset) => {
-        let organisms = $dataset.columns || [];
-        organisms.shift()
-        return organisms;
+        return $dataset.columns || [];
     });
 
     const nodes = derived(labels, ($labels) => {
@@ -30,12 +37,12 @@
         return generateMatrixEdgelist($labels, $dataset);
     })
 
-    setContext('threshold', {threshold});
     setContext('data', {
-        labels, nodes, edges, matrixEdges, dataset 
+        dataset, labels, nodes, edges, matrixEdges  
     });
 
     // $:console.log($dataset);
+    // $:console.log($labels);
     // $:console.log($nodes);
     // $:console.log($edges);
 
@@ -44,13 +51,11 @@
         const edgeList = [];
         for(let rowIndex = 0; rowIndex < dataset.length; rowIndex++) {
             const row = dataset[rowIndex];
-            for(const colName in row) {
-                if(colName !== "") {
-                    const v = +row[colName];
-                    if(v > threshold) {
-                        const edge = {source: labels[rowIndex], target: colName, value: v};
-                        edgeList.push(edge);
-                    } 
+            for (let colIndex = 0; colIndex < row.length; colIndex++) {
+                const v = +row[colIndex];
+                if (v > threshold) {
+                    const edge = {source: labels[rowIndex], target: labels[colIndex], value: v};
+                    edgeList.push(edge);
                 }
             }
         }
@@ -60,12 +65,10 @@
         const edgeList = [];
         for(let rowIndex = 0; rowIndex < dataset.length; rowIndex++) {
             const row = dataset[rowIndex];
-            for(const colName in row) {
-                if(colName !== "") {
-                    const v = +row[colName];
-                    const edge = {source: labels[rowIndex], target: colName, value: v};
-                    edgeList.push(edge);
-                }
+            for (let colIndex = 0; colIndex < row.length; colIndex++) {
+                const v = +row[colIndex];
+                const edge = {source: labels[rowIndex], target: labels[colIndex], value: v};
+                edgeList.push(edge);
             }
         }
         return edgeList;
