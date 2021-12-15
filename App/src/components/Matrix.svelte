@@ -5,7 +5,7 @@
     export let width = 1000;
     export let height = 800;
 
-    const {labels, dataset} = getContext('data');
+    const {labels, matrixEdges} = getContext('data');
 
     // Variables
     const margin = {top: 10, right: 10, bottom: 10, left: 10};
@@ -27,14 +27,12 @@
 
 <svg width={width} height={height}>
     <g transform={`translate(${margin.left}, ${margin.top})`}>
-        {#each $dataset as row, i}
-            {#each Object.entries(row) as [label, value]}
-                <rect x={colScale(label)}
-                    y={rowScale($labels[i])}
+        {#each $matrixEdges as cell}
+                <rect x={colScale(cell.source)}
+                    y={rowScale(cell.target)}
                     width={colScale.bandwidth()-.5}
                     height={rowScale.bandwidth()-.5}
-                    fill={colorScale(value)} />
-            {/each}
+                    fill={colorScale(cell.value)} />
         {/each}
     </g>
 </svg>

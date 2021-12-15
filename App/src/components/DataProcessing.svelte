@@ -26,9 +26,13 @@
         return generateEdgelist($labels, $dataset, $threshold);
     })
 
+    const matrixEdges = derived([dataset,labels], ([$dataset, $labels]) => {
+        return generateMatrixEdgelist($labels, $dataset);
+    })
+
     setContext('threshold', {threshold});
     setContext('data', {
-        labels, nodes, edges, dataset 
+        labels, nodes, edges, matrixEdges, dataset 
     });
 
     // $:console.log($dataset);
@@ -47,6 +51,20 @@
                         const edge = {source: labels[rowIndex], target: colName, value: v};
                         edgeList.push(edge);
                     } 
+                }
+            }
+        }
+        return edgeList;
+    }
+    function generateMatrixEdgelist(labels, dataset) {
+        const edgeList = [];
+        for(let rowIndex = 0; rowIndex < dataset.length; rowIndex++) {
+            const row = dataset[rowIndex];
+            for(const colName in row) {
+                if(colName !== "") {
+                    const v = +row[colName];
+                    const edge = {source: labels[rowIndex], target: colName, value: v};
+                    edgeList.push(edge);
                 }
             }
         }
