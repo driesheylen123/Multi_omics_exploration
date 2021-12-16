@@ -73,7 +73,7 @@
 </script> -->
 
 <script>
-    import { clustering } from '../druid.js'
+    import { hclust } from '../clustering.js'
     import { getContext } from 'svelte';
 
     const {labels, dataset} = getContext('data');

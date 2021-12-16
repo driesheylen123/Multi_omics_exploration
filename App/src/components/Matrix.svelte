@@ -1,8 +1,9 @@
 <script>
-    import { scaleBand, scaleDiverging, interpolateRdBu } from 'd3';
+    import { scaleBand, scaleDiverging, interpolateRdBu, select, brush } from 'd3';
     import { getContext } from 'svelte';
-    import { linkage } from '../stores.js'
-    import { clustering } from '../druid.js';
+    import { linkage, selectedNodes } from '../stores.js'
+    import { hclust } from '../clustering.js';
+    import Dendogram from './Dendogram.svelte';
 
     export let width = 1000;
     export let height = 800;
@@ -14,35 +15,61 @@
     const margin = {top: 10, right: 10, bottom: 10, left: 10};
     let innerHeight = height - margin.top - margin.bottom;
     let innerWidth = width - margin.left - margin.right;
+    let drawDendogram = 0;
 
     // Scales
     const rowScale = scaleBand().domain($nodes.map(d => d.label)).range([0, innerHeight]);
     const colScale = scaleBand().domain($nodes.map(d => d.label)).range([0, innerWidth]);
     const colorScale = scaleDiverging().domain([-1,0,1]).interpolator(interpolateRdBu);
+    let bandWidth;
+    
 
     $: {
         if ($dataset.length > 0) {
             if ($linkage !== 'none') {
-                let order = clustering($dataset, $linkage);
+                let {order, dendogram, result} = hclust($dataset, $linkage);
                 $nodes.sort((a,b) => {
                     return order.indexOf(a.id) - order.indexOf(b.id)
                 });
+                drawDendogram = 1;
             } else {
                 $nodes.sort((a,b) => {
                     return a.id - b.id
                 });
+                drawDendogram = 0;
             }
         }
         rowScale.domain($nodes.map(d => d.label));
         colScale.domain($nodes.map(d => d.label));
+        bandWidth = rowScale.bandwidth();
         matrixEdgesCopy = matrixEdgesCopy;
-        
+    }
+
+    // Functions
+    const brushing = brush().on("brush end", detail);
+
+    // Bug: this only works for the first rows and columns of the matrix.. 
+    // if you brush towards the bottom right no selection is passed..
+    function detail({selection}) {
+        if (selection) {
+            const [[x0,y0],[x1,y1]] = selection;
+            // console.log([[x0,y0],[x1,y1]]);
+            $selectedNodes = $nodes.filter(d => x0 <= rowScale(d.label) && rowScale(d.label) < x1 && y0 <= colScale(d.label) && colScale(d.label) < y1 || x0 <= (rowScale(d.label) + bandWidth) && rowScale(d.label) < x1 && y0 <= (colScale(d.label) + bandWidth) && colScale(d.label) < y1);
+            // console.log($selectedNodes);
+        } else {
+            $selectedNodes = $nodes;
+        }
+    }
+
+    function addCustomListeners(dom) {
+        select(dom).call(brushing);
     }
 
 </script>
 
 
-<svg width={width} height={height}>
+<svg width={width} height={height} use:addCustomListeners>
+    <!-- Matrix -->
     <g transform={`translate(${margin.left}, ${margin.top})`}>
         {#each matrixEdgesCopy as cell}
                 <rect x={colScale(cell.source)}
@@ -52,4 +79,16 @@
                     fill={colorScale(cell.value)} />
         {/each}
     </g>
+    <!-- Dendogram -->
+    {#if drawDendogram}
+        <!-- <Dendogram dendogram={dendogram} 
+            type="depth" 
+            data={result} 
+            margin={margin} 
+            width:[width] 
+            bandwidth={bandwidth}>
+        </Dendogram> -->
+        <!-- Type can be either "depth" of "dist" -->
+    {/if}
 </svg>
+

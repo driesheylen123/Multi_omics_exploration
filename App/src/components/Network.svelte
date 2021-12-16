@@ -2,6 +2,7 @@
     import { getContext } from 'svelte';
     import { forceSimulation, forceLink, forceManyBody, forceCollide, forceCenter, select } from 'd3';
     import { dragFunction } from '../drag.js'
+    import { selectedNodes } from '../stores.js'
 
     const {nodes, edges} = getContext('data');
     $: nodesCopy = $nodes;
@@ -30,6 +31,14 @@
     $: {
         simulation.nodes(nodesCopy);
         linkForce.links(edgesCopy);
+    }
+
+    $: {
+        if ($selectedNodes.length > 0) {
+            // console.log($selectedNodes);
+            nodesCopy = $selectedNodes;
+            edgesCopy = edgesCopy.filter(r => $selectedNodes.map(d => d.label).includes(r.source.label) && $selectedNodes.map(d => d.label).includes(r.target.label));
+        }
     }
 
 
@@ -66,7 +75,8 @@
                 cx="{node.x}" 
                 cy="{node.y}" 
                 r={radius}
-                />         
+                title={node.label}
+                />       
             {/each}
         </g>
     </g>
