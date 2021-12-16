@@ -1,6 +1,5 @@
 export function clustering(data, linkage) {
 
-    console.log('triggered')
     // Transform into druidjs matrix object
     let matrix = druid.Matrix.from(data);
 

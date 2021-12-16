@@ -21,7 +21,7 @@
 	<Menu/>
 	<div>
 		<Matrix width={1000} height={800}/>
-		<!-- <Network width={1000} height={800} radius={5} /> -->
+		<Network width={1000} height={800} radius={5} />
 	</div>
 </DataProcessing>
 

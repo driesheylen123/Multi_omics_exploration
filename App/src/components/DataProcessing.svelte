@@ -19,55 +19,54 @@
 		$dataset = data;
 	});
 
-    const labels = derived(dataset, ($dataset) => {
-        return $dataset.columns || [];
+    const nodes = derived(dataset, ($dataset) => {
+        if ($dataset.length > 0) {
+            return $dataset.columns.map(d => {
+                return {'id': $dataset.columns.indexOf(d), 'label': d};
+            })
+        } else {
+            return [];
+        }
     });
 
-    const nodes = derived(labels, ($labels) => {
-        return $labels.map(d => {
-            return {'id': d}
-        });
-    });
-
-    const edges = derived([dataset,labels,threshold], ([$dataset, $labels, $threshold]) => {
-        return generateEdgelist($labels, $dataset, $threshold);
+    const edges = derived([dataset,nodes,threshold], ([$dataset, $nodes, $threshold]) => {
+        return generateEdgelist($nodes, $dataset, $threshold);
     })
 
-    const matrixEdges = derived([dataset,labels], ([$dataset, $labels]) => {
-        return generateMatrixEdgelist($labels, $dataset);
+    const matrixEdges = derived([dataset,nodes], ([$dataset, $nodes]) => {
+        return generateMatrixEdgelist($nodes, $dataset);
     })
 
     setContext('data', {
-        dataset, labels, nodes, edges, matrixEdges  
+        dataset, nodes, edges, matrixEdges  
     });
 
     // $:console.log($dataset);
-    // $:console.log($labels);
     // $:console.log($nodes);
     // $:console.log($edges);
 
     // Functions
-    function generateEdgelist(labels, dataset, threshold) {
+    function generateEdgelist(nodes, dataset, threshold) {
         const edgeList = [];
         for(let rowIndex = 0; rowIndex < dataset.length; rowIndex++) {
             const row = dataset[rowIndex];
             for (let colIndex = 0; colIndex < row.length; colIndex++) {
                 const v = +row[colIndex];
                 if (v > threshold) {
-                    const edge = {source: labels[rowIndex], target: labels[colIndex], value: v};
+                    const edge = {source: nodes[rowIndex].label, target: nodes[colIndex].label, value: v};
                     edgeList.push(edge);
                 }
             }
         }
         return edgeList;
     }
-    function generateMatrixEdgelist(labels, dataset) {
+    function generateMatrixEdgelist(nodes, dataset) {
         const edgeList = [];
         for(let rowIndex = 0; rowIndex < dataset.length; rowIndex++) {
             const row = dataset[rowIndex];
             for (let colIndex = 0; colIndex < row.length; colIndex++) {
                 const v = +row[colIndex];
-                const edge = {source: labels[rowIndex], target: labels[colIndex], value: v};
+                const edge = {source: nodes[rowIndex].label, target: nodes[colIndex].label, value: v};
                 edgeList.push(edge);
             }
         }

@@ -13,7 +13,7 @@
     export let height = 800;
     export let radius = 4;
 
-    const linkForce = forceLink().id(d => d.id);
+    const linkForce = forceLink().id(d => d.label);
     const simulation = forceSimulation()
         .alphaTarget(0.02)   
         .alphaDecay(0)
