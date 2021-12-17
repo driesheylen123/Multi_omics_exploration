@@ -29,11 +29,11 @@
         }
     });
 
-    const edges = derived([dataset,nodes,threshold], ([$dataset, $nodes, $threshold]) => {
+    const edges = derived([nodes,dataset,threshold], ([$nodes, $dataset, $threshold]) => {
         return generateEdgelist($nodes, $dataset, $threshold);
     })
 
-    const matrixEdges = derived([dataset,nodes], ([$dataset, $nodes]) => {
+    const matrixEdges = derived([nodes,dataset], ([$nodes, $dataset]) => {
         return generateMatrixEdgelist($nodes, $dataset);
     })
 
@@ -43,7 +43,8 @@
 
     // $:console.log($dataset);
     // $:console.log($nodes);
-    // $:console.log($edges);
+    $:console.log($edges);
+    $:console.log($matrixEdges);
 
     // Functions
     function generateEdgelist(nodes, dataset, threshold) {
@@ -52,9 +53,11 @@
             const row = dataset[rowIndex];
             for (let colIndex = 0; colIndex < row.length; colIndex++) {
                 const v = +row[colIndex];
-                if (v > threshold) {
-                    const edge = {source: nodes[rowIndex].label, target: nodes[colIndex].label, value: v};
-                    edgeList.push(edge);
+                if (Math.abs(v) > threshold) {
+                    if (nodes[rowIndex].label !== nodes[colIndex].label) {
+                        const edge = {source: nodes[rowIndex].label, target: nodes[colIndex].label, value: v};
+                        edgeList.push(edge);
+                    }
                 }
             }
         }

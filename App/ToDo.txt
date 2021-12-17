@@ -1,10 +1,6 @@
 To Do list for the Network Brush Svelte App
 ----------------------------------------------
 
-1. Add Zooming function to Network.svelte
 2. Add node highlight function to Network.svelte
-3. Add bruhs on Matrix component.
-4. Store selection of brush in a svelte store (writable).
-5. Update Network on brush/selection.
 
 

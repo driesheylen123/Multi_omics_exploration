@@ -36,7 +36,6 @@
 
     $: {
         if ($selectedNodes.length > 0) {
-            // console.log($selectedNodes);
             nodesCopy = $selectedNodes;
             edgesCopy = edgesCopy.filter(r => $selectedNodes.map(d => d.label).includes(r.source.label) && $selectedNodes.map(d => d.label).includes(r.target.label));
         }

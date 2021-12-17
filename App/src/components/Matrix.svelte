@@ -3,6 +3,7 @@
     import { getContext } from 'svelte';
     import { linkage, selectedNodes } from '../stores.js'
     import { hclust } from '../js/clustering.js';
+    // import { brushFunction } from '../js/brush.js';
     import Dendogram from './Dendogram.svelte';
 
     export let width = 1000;
@@ -48,14 +49,14 @@
     // Functions
     const brushing = brush().on("brush end", detail);
 
-    // Bug: this only works for the first rows and columns of the matrix.. 
-    // if you brush towards the bottom right no selection is passed..
     function detail({selection}) {
         if (selection) {
-            const [[x0,y0],[x1,y1]] = selection;
-            // console.log([[x0,y0],[x1,y1]]);
-            $selectedNodes = $nodes.filter(d => x0 <= rowScale(d.label) && rowScale(d.label) < x1 && y0 <= colScale(d.label) && colScale(d.label) < y1 || x0 <= (rowScale(d.label) + bandWidth) && rowScale(d.label) < x1 && y0 <= (colScale(d.label) + bandWidth) && colScale(d.label) < y1);
-            // console.log($selectedNodes);
+            let [[x0,y0],[x1,y1]] = selection;
+            x0-=margin.left;
+            y0-=margin.top;
+            x1-=margin.left;
+            y1-=margin.top;
+            $selectedNodes = $nodes.filter(d => x0 <= colScale(d.label) && colScale(d.label) < x1 && y0 <= rowScale(d.label) && rowScale(d.label) < y1 || x0 <= (colScale(d.label) + bandWidth) && colScale(d.label) < x1 && y0 <= (rowScale(d.label) + bandWidth) && rowScale(d.label) < y1);
         } else {
             $selectedNodes = $nodes;
         }
@@ -63,6 +64,7 @@
 
     function addCustomListeners(dom) {
         select(dom).call(brushing);
+        // select(dom).call(brushFunction($nodes, $selectedNodes, margin, bandWidth));
     }
 
 </script>
@@ -76,7 +78,9 @@
                     y={rowScale(cell.target)}
                     width={colScale.bandwidth()-.5}
                     height={rowScale.bandwidth()-.5}
-                    fill={colorScale(cell.value)} />
+                    fill={colorScale(cell.value)} 
+                    opacity={$selectedNodes.map(d => d.label).includes(cell.source) && $selectedNodes.map(d => d.label).includes(cell.target) ? 1 : $selectedNodes.length > 0 ? .3 : 1}
+                    />
         {/each}
     </g>
     <!-- Dendogram -->
@@ -91,4 +95,3 @@
         <!-- Type can be either "depth" of "dist" -->
     {/if}
 </svg>
-
