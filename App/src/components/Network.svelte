@@ -1,7 +1,8 @@
 <script>
     import { getContext } from 'svelte';
-    import { forceSimulation, forceLink, forceManyBody, forceCollide, forceCenter, select } from 'd3';
-    import { dragFunction } from '../drag.js'
+    import { forceSimulation, forceLink, forceManyBody, forceCollide, forceCenter, select, zoom } from 'd3';
+    import { dragFunction } from '../js/drag.js';
+    import { zoomFunction } from '../js/zoom.js';
     import { selectedNodes } from '../stores.js'
 
     const {nodes, edges} = getContext('data');
@@ -9,7 +10,7 @@
     $: edgesCopy = $edges;
 
     const margin = {top: 10, right: 10, bottom: 10, left: 10};
-   
+
     export let width = 1000;
     export let height = 800;
     export let radius = 4;
@@ -43,7 +44,7 @@
 
 
     // Functions
-    function addCustomListeners(circle) {
+    function addNodeListeners(circle) {
 
         return {
             update(node) {
@@ -54,9 +55,13 @@
 
     }
 
+    function addSVGListeners(dom) {
+        select(dom).call(zoomFunction(width, height));
+    }
+
 </script>
 
-<svg width={width} height={height}>
+<svg width={width} height={height} use:addSVGListeners>
     <g transform={`translate(${margin.left}, ${margin.top})`}>
         <g class="edges">
             {#each edgesCopy as link}
@@ -71,7 +76,7 @@
         <g class="nodes">
             {#each nodesCopy as node}
                 <circle class='node' 
-                use:addCustomListeners={node}
+                use:addNodeListeners={node}
                 cx="{node.x}" 
                 cy="{node.y}" 
                 r={radius}
@@ -88,6 +93,7 @@
         fill: #000981ce;
         stroke: #fff;
         stroke-width: 1px;
+        opacity: 1;
     }
     .link {
         stroke: #cccccc;

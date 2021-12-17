@@ -2,7 +2,7 @@
     import { scaleBand, scaleDiverging, interpolateRdBu, select, brush } from 'd3';
     import { getContext } from 'svelte';
     import { linkage, selectedNodes } from '../stores.js'
-    import { hclust } from '../clustering.js';
+    import { hclust } from '../js/clustering.js';
     import Dendogram from './Dendogram.svelte';
 
     export let width = 1000;

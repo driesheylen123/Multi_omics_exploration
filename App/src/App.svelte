@@ -5,7 +5,7 @@
 	import Network from "./components/Network.svelte";
 	import DataProcessing from "./components/DataProcessing.svelte";
 
-	import TestComponent from "./components/TestComponent.svelte";
+	// import TestComponent from "./components/TestComponent.svelte";
 	
 	
 		

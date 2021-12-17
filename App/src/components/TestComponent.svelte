@@ -73,7 +73,7 @@
 </script> -->
 
 <script>
-    import { hclust } from '../clustering.js'
+    import { hclust } from '../js/clustering.js'
     import { getContext } from 'svelte';
 
     const {labels, dataset} = getContext('data');
