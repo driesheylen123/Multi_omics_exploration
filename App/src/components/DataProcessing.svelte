@@ -43,8 +43,8 @@
 
     // $:console.log($dataset);
     // $:console.log($nodes);
-    $:console.log($edges);
-    $:console.log($matrixEdges);
+    // $:console.log($edges);
+    // $:console.log($matrixEdges);
 
     // Functions
     function generateEdgelist(nodes, dataset, threshold) {

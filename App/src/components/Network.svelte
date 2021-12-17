@@ -1,9 +1,9 @@
 <script>
     import { getContext } from 'svelte';
-    import { forceSimulation, forceLink, forceManyBody, forceCollide, forceCenter, select, zoom } from 'd3';
+    import { forceSimulation, forceLink, forceManyBody, forceCollide, forceCenter, select, selectAll } from 'd3';
     import { dragFunction } from '../js/drag.js';
     import { zoomFunction } from '../js/zoom.js';
-    import { selectedNodes } from '../stores.js'
+    import { selectedNodes, highlighted } from '../stores.js'
 
     const {nodes, edges} = getContext('data');
     $: nodesCopy = $nodes;
@@ -58,6 +58,19 @@
         select(dom).call(zoomFunction(width, height));
     }
 
+    // Node highlighting
+    function highlight() {
+        const current = select(this).attr('title');
+        $highlighted.push(current);
+        $highlighted.push(...edgesCopy.filter(k => k.source.label === current).map(d => d.target.label));
+        $highlighted.push(...edgesCopy.filter(k => k.target.label === current).map(d => d.source.label));
+        $highlighted = [...new Set($highlighted)];
+    }
+
+    function fade() {
+        $highlighted = [];
+    }
+
 </script>
 
 <svg width={width} height={height} use:addSVGListeners>
@@ -69,7 +82,9 @@
                     y1={link.source.y} 
                     x2={link.target.x} 
                     y2={link.target.y} 
-                    style="stroke-width:{link.value}" />
+                    style="stroke-width:{link.value}" 
+                    opacity={$highlighted.includes(link.source.label) || $highlighted.includes(link.target.label) ? 1 : $highlighted.length > 1 ? .5 : 1}
+                    />
             {/each}
         </g>
         <g class="nodes">
@@ -80,6 +95,9 @@
                 cy="{node.y}" 
                 r={radius}
                 title={node.label}
+                on:mouseover={highlight}
+                on:mouseout={fade}
+                opacity={$highlighted.includes(node.label) ? 1 : $highlighted.length > 0 ? 0.5 : 1}
                 />       
             {/each}
         </g>
@@ -92,10 +110,8 @@
         fill: #000981ce;
         stroke: #fff;
         stroke-width: 1px;
-        opacity: 1;
     }
     .link {
         stroke: #cccccc;
-        stroke-opacity: .6;
     }
 </style>

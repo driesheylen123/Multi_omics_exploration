@@ -1,6 +1,3 @@
 To Do list for the Network Brush Svelte App
 ----------------------------------------------
 
-2. Add node highlight function to Network.svelte
-
-
