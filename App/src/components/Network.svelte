@@ -90,15 +90,16 @@
         <g class="nodes">
             {#each nodesCopy as node}
                 <circle class='node' 
-                use:addNodeListeners={node}
-                cx="{node.x}" 
-                cy="{node.y}" 
-                r={radius}
-                title={node.label}
-                on:mouseover={highlight}
-                on:mouseout={fade}
-                opacity={$highlighted.includes(node.label) ? 1 : $highlighted.length > 0 ? 0.5 : 1}
-                />       
+                        use:addNodeListeners={node}
+                        cx="{node.x}" 
+                        cy="{node.y}" 
+                        r={radius}
+                        title={node.label}
+                        on:mouseover={highlight}
+                        on:mouseout={fade}
+                        opacity={$highlighted.includes(node.label) ? 1 : $highlighted.length > 0 ? 0.5 : 1}>
+                    <title> { node.label } </title>
+                </circle>       
             {/each}
         </g>
     </g>

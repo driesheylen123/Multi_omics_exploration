@@ -34,7 +34,7 @@
     })
 
     const matrixEdges = derived([nodes,dataset], ([$nodes, $dataset]) => {
-        return generateMatrixEdgelist($nodes, $dataset);
+        return generateEdgelist($nodes, $dataset, 0);
     })
 
     setContext('data', {
@@ -59,18 +59,6 @@
                         edgeList.push(edge);
                     }
                 }
-            }
-        }
-        return edgeList;
-    }
-    function generateMatrixEdgelist(nodes, dataset) {
-        const edgeList = [];
-        for(let rowIndex = 0; rowIndex < dataset.length; rowIndex++) {
-            const row = dataset[rowIndex];
-            for (let colIndex = 0; colIndex < row.length; colIndex++) {
-                const v = +row[colIndex];
-                const edge = {source: nodes[rowIndex].label, target: nodes[colIndex].label, value: v};
-                edgeList.push(edge);
             }
         }
         return edgeList;
