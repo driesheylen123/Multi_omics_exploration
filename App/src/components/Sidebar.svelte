@@ -1,7 +1,34 @@
 <script>
-    import { threshold, linkage } from '../stores.js';
+    import { threshold, radius, linkage, renderVisuals, simulationPause } from '../stores.js';
 
     const methods = ["none", "single", "complete", "average"];
+
+    // Apparently, this doesn't work in Svelte..
+    // const run_btn = document.getElementById("btn-run");
+    // const pause_btn = document.getElementById("btn-pause");
+    // const reset_btn = document.getElementById("btn-reset");    
+
+    function eventHandler_runBtn() {
+        // run_btn.disabled = true;
+        // pause_btn.disabled = false;
+        // reset_btn.disabled = false;
+        this.disabled = true;
+        $renderVisuals = true;
+        $simulationPause = false;
+    }
+    function eventHandler_pauseBtn() {
+        // run_btn.disabled = false;
+        // pause_btn.disabled = true;
+        // reset_btn.disabled = false;
+        $simulationPause = true;
+    }
+    function eventHandler_resetBtn() {
+        // run_btn.disabled = false;
+        // pause_btn.disabled = true;
+        // reset_btn.disabled = true;
+        $renderVisuals = false;
+    }
+
 </script>
 
 <div id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark">
@@ -16,7 +43,11 @@
         </div>
         <div class="mb-4">
             <label for="threshold" class="form-label">Threshold: {$threshold}</label>
-            <input type="range" class="form-range" min="0" max="1" step="0.01" bind:value={$threshold} id="threshold">
+            <input type="range" class="form-range" min="0" max="1" step="0.01" bind:value={$threshold} id="threshold" disabled>
+        </div>
+        <div class="mb-4">
+            <label for="node-radius" class="form-label">Node radius: {$radius}</label>
+            <input type="range" class="form-range" min="1" max="10" step="1" bind:value={$radius} id="node-radius">
         </div>
         <div class="mb-4">
             <label for="clustering-method" class="form-label">Select Clustering</label>
@@ -26,7 +57,10 @@
                 {/each}
             </select>
         </div>
-        <button class="btn btn-primary">Run</button>
+        <button type="button" class="btn btn-primary" id="btn-run" on:click={eventHandler_runBtn}>Run</button>
+        <button type="button" class="btn btn-primary" id="btn-pause" on:click={eventHandler_pauseBtn} disabled>Pause</button>
+        <button type="button" class="btn btn-primary" id="btn-reset" on:click={eventHandler_resetBtn} disabled>Reset</button>
+
     </form>
     <div>
         <a href="#" class="text-white text-decoration-none">Documentation</a>

@@ -3,17 +3,16 @@
     import { forceSimulation, forceLink, forceManyBody, forceCollide, forceCenter, select, selectAll } from 'd3';
     import { dragFunction } from '../js/drag.js';
     import { zoomFunction } from '../js/zoom.js';
-    import { selectedNodes, highlighted } from '../stores.js'
+    import { radius, selectedNodes, highlighted } from '../stores.js'
 
     const {nodes, edges} = getContext('data');
     $: nodesCopy = $nodes;
     $: edgesCopy = $edges;
 
-    const margin = {top: 10, right: 10, bottom: 10, left: 10};
+    const margin = {top: 10, right: 20, bottom: 10, left: 20};
 
-    export let width = 1000;
-    export let height = 800;
-    export let radius = 4;
+    const width = 500;
+    const height = 500;
 
     const linkForce = forceLink().id(d => d.label);
     const simulation = forceSimulation()
@@ -73,7 +72,7 @@
 
 </script>
 
-<svg width={width} height={height} use:addSVGListeners>
+<svg width="100%" viewBox="0 0 500 500" use:addSVGListeners>
     <g transform={`translate(${margin.left}, ${margin.top})`}>
         <g class="edges">
             {#each edgesCopy as link}
@@ -93,7 +92,7 @@
                         use:addNodeListeners={node}
                         cx="{node.x}" 
                         cy="{node.y}" 
-                        r={radius}
+                        r={$radius}
                         title={node.label}
                         on:mouseover={highlight}
                         on:mouseout={fade}

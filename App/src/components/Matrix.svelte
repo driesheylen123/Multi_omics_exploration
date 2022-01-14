@@ -6,14 +6,14 @@
     // import { brushFunction } from '../js/brush.js';
     import Dendogram from './Dendogram.svelte';
 
-    export let width = 1000;
-    export let height = 800;
+    const width = 500;
+    const height = 500;
 
     const {nodes, matrixEdges, dataset} = getContext('data');
     $: matrixEdgesCopy = $matrixEdges;
 
     // Variables
-    const margin = {top: 10, right: 10, bottom: 10, left: 10};
+    const margin = {top: 10, right: 20, bottom: 10, left: 20};
     let innerHeight = height - margin.top - margin.bottom;
     let innerWidth = width - margin.left - margin.right;
     let drawDendogram = 0;
@@ -70,7 +70,7 @@
 </script>
 
 
-<svg width={width} height={height} use:addCustomListeners>
+<svg width="100%" viewBox="0 0 500 500" use:addCustomListeners>
     <!-- Matrix -->
     <g transform={`translate(${margin.left}, ${margin.top})`}>
         {#each matrixEdgesCopy as cell}
