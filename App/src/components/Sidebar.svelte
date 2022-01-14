@@ -3,29 +3,25 @@
 
     const methods = ["none", "single", "complete", "average"];
 
-    // Apparently, this doesn't work in Svelte..
-    // const run_btn = document.getElementById("btn-run");
-    // const pause_btn = document.getElementById("btn-pause");
-    // const reset_btn = document.getElementById("btn-reset");    
+    let run_btn, pause_btn, reset_btn;    
 
     function eventHandler_runBtn() {
-        // run_btn.disabled = true;
-        // pause_btn.disabled = false;
-        // reset_btn.disabled = false;
-        this.disabled = true;
+        run_btn.disabled = true;
+        pause_btn.disabled = false;
+        reset_btn.disabled = false;
         $renderVisuals = true;
         $simulationPause = false;
     }
     function eventHandler_pauseBtn() {
-        // run_btn.disabled = false;
-        // pause_btn.disabled = true;
-        // reset_btn.disabled = false;
+        run_btn.disabled = false;
+        pause_btn.disabled = true;
+        reset_btn.disabled = false;
         $simulationPause = true;
     }
     function eventHandler_resetBtn() {
-        // run_btn.disabled = false;
-        // pause_btn.disabled = true;
-        // reset_btn.disabled = true;
+        run_btn.disabled = false;
+        pause_btn.disabled = true;
+        reset_btn.disabled = true;
         $renderVisuals = false;
     }
 
@@ -57,9 +53,9 @@
                 {/each}
             </select>
         </div>
-        <button type="button" class="btn btn-primary" id="btn-run" on:click={eventHandler_runBtn}>Run</button>
-        <button type="button" class="btn btn-primary" id="btn-pause" on:click={eventHandler_pauseBtn} disabled>Pause</button>
-        <button type="button" class="btn btn-primary" id="btn-reset" on:click={eventHandler_resetBtn} disabled>Reset</button>
+        <button type="button" class="btn btn-primary" bind:this={run_btn} on:click={eventHandler_runBtn}>Run</button>
+        <button type="button" class="btn btn-primary" bind:this={pause_btn} on:click={eventHandler_pauseBtn} disabled>Pause</button>
+        <button type="button" class="btn btn-primary" bind:this={reset_btn} on:click={eventHandler_resetBtn} disabled>Reset</button>
 
     </form>
     <div>

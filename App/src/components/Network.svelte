@@ -3,7 +3,7 @@
     import { forceSimulation, forceLink, forceManyBody, forceCollide, forceCenter, select, selectAll } from 'd3';
     import { dragFunction } from '../js/drag.js';
     import { zoomFunction } from '../js/zoom.js';
-    import { radius, selectedNodes, highlighted } from '../stores.js'
+    import { radius, simulationPause, selectedNodes, highlighted } from '../stores.js'
 
     const {nodes, edges} = getContext('data');
     $: nodesCopy = $nodes;
@@ -31,6 +31,10 @@
     $: {
         simulation.nodes(nodesCopy);
         linkForce.links(edgesCopy);
+    }
+
+    $: {
+        $simulationPause ? simulation.stop() : simulation.restart();
     }
 
     $: {
