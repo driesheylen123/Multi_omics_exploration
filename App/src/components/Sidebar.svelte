@@ -39,7 +39,7 @@
         </div>
         <div class="mb-4">
             <label for="threshold" class="form-label">Threshold: {$threshold}</label>
-            <input type="range" class="form-range" min="0" max="1" step="0.01" bind:value={$threshold} id="threshold" disabled>
+            <input type="range" class="form-range" min="0" max="1" step="0.01" bind:value={$threshold} id="threshold">
         </div>
         <div class="mb-4">
             <label for="node-radius" class="form-label">Node radius: {$radius}</label>

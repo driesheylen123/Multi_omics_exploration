@@ -1,6 +1,6 @@
 <script>
     import { getContext } from 'svelte';
-    import { forceSimulation, forceLink, forceManyBody, forceCollide, forceCenter, select, selectAll } from 'd3';
+    import { forceSimulation, forceLink, forceManyBody, forceCollide, forceCenter, select, scaleDiverging, interpolateRdBu } from 'd3';
     import { dragFunction } from '../js/drag.js';
     import { zoomFunction } from '../js/zoom.js';
     import { radius, simulationPause, selectedNodes, highlighted } from '../stores.js'
@@ -13,6 +13,8 @@
 
     const width = 500;
     const height = 500;
+
+    const colorScale = scaleDiverging().domain([-1,0,1]).interpolator(interpolateRdBu);
 
     const linkForce = forceLink().id(d => d.label);
     const simulation = forceSimulation()
@@ -86,6 +88,7 @@
                     x2={link.target.x} 
                     y2={link.target.y} 
                     style="stroke-width:{link.value}" 
+                    stroke={colorScale(link.value)}
                     opacity={$highlighted.includes(link.source.label) || $highlighted.includes(link.target.label) ? 1 : $highlighted.length > 1 ? .5 : 1}
                     />
             {/each}
@@ -113,9 +116,9 @@
     .node {
         fill: #000981ce;
         stroke: #fff;
-        stroke-width: 1px;
+        stroke-width: .5px;
     }
-    .link {
+    /* .link {
         stroke: #cccccc;
-    }
+    } */
 </style>
