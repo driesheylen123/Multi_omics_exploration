@@ -1,23 +1,23 @@
 <script>
-    import { csv } from 'd3';
+    
     import { setContext } from 'svelte';
     import { derived, writable } from 'svelte/store';
-    import { threshold } from '../stores.js'
+    import { input_file, threshold } from '../stores.js'
 
     const dataset = writable([]);
-
-	csv('data/protein_network_correlation_big.csv', function(row) {
-        // Data prep: each row is originally an object, but needs to be an array. 
-        // Hence, we extract all column values for each row and store these in an array.
-        // The first value contains the row name, so we remove this value.
-        let row_asArray = Object.values(row);
-        row_asArray.shift();    // 
-        return row_asArray;
-    }).then(function(data) {
-        // Remove empty column value
-        data.columns.shift();
-		$dataset = data;
-	});
+    $: {
+        if ($input_file.length > 0) {
+            console.log('Running');
+            $input_file.forEach(element => {
+                element = Object.values(element);
+                element.shift();
+                $dataset.push(element);
+            });
+            $input_file.columns.shift();
+            $dataset.columns = $input_file.columns;
+            console.log($dataset);
+        }
+    }
 
     const nodes = derived(dataset, ($dataset) => {
         if ($dataset.length > 0) {

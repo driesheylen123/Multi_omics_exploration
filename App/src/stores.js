@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
 
+export const input_file = writable([]);
 export const renderVisuals = writable(false);
 export const simulationPause = writable(false);
 export const threshold = writable(.5);

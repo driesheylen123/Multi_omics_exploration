@@ -1,10 +1,11 @@
 <script>
-    import { threshold, radius, linkage, renderVisuals, simulationPause } from '../stores.js';
+    import { csvParse } from 'd3';
+    import { input_file, threshold, radius, linkage, renderVisuals, simulationPause } from '../stores.js';
 
     const methods = ["none", "single", "complete", "average"];
 
+    // Buttons
     let run_btn, pause_btn, reset_btn;    
-
     function eventHandler_runBtn() {
         run_btn.disabled = true;
         pause_btn.disabled = false;
@@ -25,6 +26,27 @@
         $renderVisuals = false;
     }
 
+    // Input File
+    let csvFile;
+	const reader = new FileReader()
+
+	$: {
+		if (csvFile) {
+			reader.readAsText(csvFile[0]);
+		}
+	}
+
+	reader.onload = function (event) {
+		$input_file = csvParse(event.target.result);
+	}
+
+	reader.onprogress = function (event) {
+		if (event.loaded && event.total) {
+			const percent = (event.loaded / event.total) * 100;
+			console.log(`Loaded: ${Math.round(percent)}%`);
+		}
+	};
+
 </script>
 
 <div id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark">
@@ -35,7 +57,7 @@
     <form class="mb-auto mt-4">
         <div class="mb-4">
             <label for="formFile" class="form-label">Input File</label>
-            <input class="form-control" type="file" id="formFile">
+            <input class="form-control" type="file" bind:files={csvFile} id="formFile">
         </div>
         <div class="mb-4">
             <label for="threshold" class="form-label">Threshold: {$threshold}</label>
