@@ -56,7 +56,7 @@
             y0-=margin.top;
             x1-=margin.left;
             y1-=margin.top;
-            $selectedNodes = $nodes.filter(d => x0 <= colScale(d.label) && colScale(d.label) < x1 && y0 <= rowScale(d.label) && rowScale(d.label) < y1 || x0 <= (colScale(d.label) + bandWidth) && colScale(d.label) < x1 && y0 <= (rowScale(d.label) + bandWidth) && rowScale(d.label) < y1);
+            $selectedNodes = $nodes.filter(d => x0 <= colScale(d.label) && colScale(d.label) < x1 || y0 <= rowScale(d.label) && rowScale(d.label) < y1 || x0 <= (colScale(d.label) + bandWidth) && colScale(d.label) < x1 || y0 <= (rowScale(d.label) + bandWidth) && rowScale(d.label) < y1);
         } else {
             $selectedNodes = $nodes;
         }
