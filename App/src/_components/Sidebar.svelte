@@ -1,9 +1,8 @@
 <script>
-    import { csvParse } from 'd3';
-    import { input_file, threshold, radius, linkage, renderVisuals, simulationPause } from '../stores.js';
 
+    import { _data, threshold, radius, linkage, renderVisuals, simulationPause } from '../stores.js';
     const methods = ["none", "single", "complete", "average"];
-
+    
     // Buttons
     let run_btn, pause_btn, reset_btn;    
     function eventHandler_runBtn() {
@@ -25,21 +24,18 @@
         reset_btn.disabled = true;
         $renderVisuals = false;
     }
-
     // Input File
-    let csvFile;
+    let file;
 	const reader = new FileReader()
-
 	$: {
-		if (csvFile) {
-			reader.readAsText(csvFile[0]);
+		if (file) {
+			reader.readAsText(file[0]);
 		}
 	}
-
 	reader.onload = function (event) {
-		$input_file = csvParse(event.target.result);
+        $_data = JSON.parse(event.target.result);
+        run_btn.disabled = false;
 	}
-
 	reader.onprogress = function (event) {
 		if (event.loaded && event.total) {
 			const percent = (event.loaded / event.total) * 100;
@@ -57,7 +53,7 @@
     <form class="mb-auto mt-4">
         <div class="mb-4">
             <label for="formFile" class="form-label">Input File</label>
-            <input class="form-control" type="file" bind:files={csvFile} id="formFile">
+            <input class="form-control" type="file" bind:files={file} id="formFile" accept=".json">
         </div>
         <div class="mb-4">
             <label for="threshold" class="form-label">Threshold: {$threshold}</label>
@@ -65,7 +61,7 @@
         </div>
         <div class="mb-4">
             <label for="node-radius" class="form-label">Node radius: {$radius}</label>
-            <input type="range" class="form-range" min="1" max="10" step="1" bind:value={$radius} id="node-radius">
+            <input type="range" class="form-range" min="1" max="20" step="1" bind:value={$radius} id="node-radius">
         </div>
         <div class="mb-4">
             <label for="clustering-method" class="form-label">Select Clustering</label>
@@ -75,7 +71,7 @@
                 {/each}
             </select>
         </div>
-        <button type="button" class="btn btn-primary" bind:this={run_btn} on:click={eventHandler_runBtn}>Run</button>
+        <button type="button" class="btn btn-primary" bind:this={run_btn} on:click={eventHandler_runBtn} disabled>Run</button>
         <button type="button" class="btn btn-primary" bind:this={pause_btn} on:click={eventHandler_pauseBtn} disabled>Pause</button>
         <button type="button" class="btn btn-primary" bind:this={reset_btn} on:click={eventHandler_resetBtn} disabled>Reset</button>
 
