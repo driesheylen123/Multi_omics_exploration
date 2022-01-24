@@ -1,7 +1,7 @@
 <script>
 
     // Dependencies
-    import { scaleBand } from 'd3-scale';
+    import { scaleBand, scaleLinear } from 'd3-scale';
     import { extent } from 'd3-array';
     import { brush } from 'd3-brush';
     import { select } from 'd3-selection';
@@ -9,7 +9,9 @@
 
     // External JS
     import { colorScale } from '../_js/scales.js';
-    import { brushFunction } from '../_js/functions';
+    import { brushFunction, links2Matrix, hclust } from '../_js/functions';
+
+    import { linkage } from '../stores.js';
    
     // Props
     export let data = [];
@@ -17,9 +19,14 @@
     // Data handling
     let nodes = [];
     let links = [];
+    let matrix;
     $: {
         if (data.nodes) {
             [nodes, links] = [data.nodes, data.links];
+            matrix = links2Matrix(nodes, links);
+            if (!nodes.id) {
+                nodes.forEach((element, index) => element.id = index );
+            }
         }
     }
 
@@ -39,19 +46,36 @@
         }
     }
 
+    // Clustering
+    $: {
+        if ($linkage !== 'none') {
+            let clustering = hclust(matrix, $linkage);
+            let order = clustering.root.index;
+            nodes.sort((a,b) => order.indexOf(a.id) - order.indexOf(b.id));
+        } else {
+            nodes.sort((a,b) => a.id - b.id);
+        }
+        rowScale.domain(nodes.map(d => d.label));
+        colScale.domain(nodes.map(d => d.label));
+        links = links;
+    }  
+
     // Binds
     let svg, g_heatmap;
     onMount(() => {
 		select(svg).call(brush().on("brush end", brushFunction(g_heatmap)));
 	});
 
+
+    
+
 </script>
 
-<svg width="100%" viewBox="0 0 500 500" bind:this={svg}>
+<svg width="100%" viewBox={`0 0 ${width} ${height}`} bind:this={svg}>
     <g bind:this={g_heatmap}>
         {#each links as cell}
-            <rect x={colScale(cell.source.label)} 
-                y={rowScale(cell.target.label)} 
+            <rect x={colScale(cell.target.label)} 
+                y={rowScale(cell.source.label)} 
                 width={colScale.bandwidth()-.5} 
                 height={rowScale.bandwidth()-.5}
                 fill={colorScale(cell.value)}

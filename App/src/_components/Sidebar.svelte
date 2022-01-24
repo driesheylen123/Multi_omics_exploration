@@ -1,6 +1,8 @@
 <script>
+import { element } from 'svelte/internal';
 
-    import { _data, threshold, radius, linkage, renderVisuals, simulationPause } from '../stores.js';
+
+    import { _data, threshold_edges, threshold_clust, radius, linkage, renderVisuals, simulationPause } from '../stores.js';
     const methods = ["none", "single", "complete", "average"];
     
     // Buttons
@@ -56,8 +58,8 @@
             <input class="form-control" type="file" bind:files={file} id="formFile" accept=".json">
         </div>
         <div class="mb-4">
-            <label for="threshold" class="form-label">Threshold: {$threshold}</label>
-            <input type="range" class="form-range" min="0" max="1" step="0.01" bind:value={$threshold} id="threshold">
+            <label for="threshold_edges" class="form-label">Threshold edges: {$threshold_edges}</label>
+            <input type="range" class="form-range" min="0" max="1" step="0.01" bind:value={$threshold_edges} id="threshold_edges">
         </div>
         <div class="mb-4">
             <label for="node-radius" class="form-label">Node radius: {$radius}</label>
@@ -70,6 +72,10 @@
                     <option value={method}>{method}</option>
                 {/each}
             </select>
+        </div>
+        <div class="mb-4">
+            <label for="threshold_clust" class="form-label">Threshold clustering: {$threshold_clust}</label>
+            <input type="range" class="form-range" min="0" max="20" step="0.01" bind:value={$threshold_clust} id="threshold_clust">
         </div>
         <button type="button" class="btn btn-primary" bind:this={run_btn} on:click={eventHandler_runBtn} disabled>Run</button>
         <button type="button" class="btn btn-primary" bind:this={pause_btn} on:click={eventHandler_pauseBtn} disabled>Pause</button>
