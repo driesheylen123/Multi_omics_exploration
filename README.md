@@ -26,10 +26,37 @@ The input data needs to be off the format `.json`, and contains the following ar
 ```
 
 #### R json formatter
+In R, the `jsonlite` library allows us to use the function `toJSON()` and `fromJSON` to parse JSON formats. Using `write_json(fromJSON(toJSON(df)), "C:/location/df.json")`, we can write any dataframe to `.json`. Here is an example of how to transform a correlation matrix into a node link diagram and store it as a `.json` file:
 ```R
-library(json)
-df_json = toJson(df)
-write_json(df_json, "location/graph.json")
+# Load Data
+data(mtcars)
+
+# Compute correlation matrix
+correlation_matrix = cor(mtcars)
+
+# Generate edge list
+links = data.frame("source" = character(), "target" = character(), "value" = integer(), stringsAsFactors = FALSE)
+i = 0
+for(s in colnames(correlation_matrix)) {
+  for(t in colnames(correlation_matrix)) {
+    links[i,c("source")] = s 
+    links[i,c("target")] = t
+    links[i,c("value")] = correlation_matrix[c(s),c(t)]
+    i = i + 1
+  }
+}
+
+# Generate node list
+nodes = data.frame(id = seq(from=0, to=length(colnames(correlation_matrix))-1, by=1), 
+                   label = colnames(correlation_matrix), 
+                   stringsAsFactors = FALSE)
+
+# Generate node link file
+graph = list(nodes = nodes, links = links)
+
+library(jsonlite)
+graph_json = toJSON(graph, pretty = TRUE)
+write_json(fromJSON(graph_json), "C:/location/example.json")
 ```
 
 #### Python json formatter
