@@ -1,8 +1,7 @@
 import { zoom } from 'd3-zoom';
 import { select, selectAll, filter, attr } from 'd3-selection';
 import { drag } from 'd3-drag';
-import { mean, max } from 'd3-array';
-import { scaleLinear } from 'd3-scale';
+import { mean } from 'd3-array';
 import { toHighlight, nodeFilter, threshold_clust } from '../stores.js';
 
 export function zoomFunction(w, h) {
@@ -114,9 +113,7 @@ export function clusters(nodes) {
     return I
 }
 
-export function pathGenerator(link, nodes, n, w, h) {
-    const x = scaleLinear().domain([0, n]).range([0, w]);
-    const y = scaleLinear().domain([max(nodes, node => node["depth"]), 0]).range([0, h]).nice();
+export function pathGenerator(link, x, y) {
     const x1 = x(link.source.x);
     const y1 = y(link.source["depth"]);
     const x2 = x(link.target.x);
