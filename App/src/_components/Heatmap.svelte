@@ -1,7 +1,7 @@
 <script>
 
     // Dependencies
-    import { scaleBand, scaleLinear } from 'd3-scale';
+    import { scaleBand } from 'd3-scale';
     import { extent } from 'd3-array';
     import { brush } from 'd3-brush';
     import { select } from 'd3-selection';
@@ -11,7 +11,7 @@
 
     // External JS
     import { colorScale } from '../_js/scales.js';
-    import { brushFunction, links2Matrix, hclust } from '../_js/functions';
+    import { brushFunction, links2Matrix, hclust, dendogram } from '../_js/functions';
 
     import { linkage } from '../stores.js';
    
@@ -51,11 +51,14 @@
     }
 
     // Clustering
+    const h_clustering = {nodes: [], links: []};
     $: {
         if ($linkage !== 'none') {
             let clustering = hclust(matrix, $linkage);
             let order = clustering.root.index;
             nodes.sort((a,b) => order.indexOf(a.id) - order.indexOf(b.id));
+            h_clustering.nodes = clustering.root.descendants();
+            h_clustering.links = dendogram(h_clustering.nodes).links;
         } else {
             nodes.sort((a,b) => a.id - b.id);
         }
@@ -74,7 +77,7 @@
 
 {#if $linkage !== "none"}
     <div>
-        <Dendogram data={data} bandwidth={bandWidth}></Dendogram>
+        <Dendogram data={h_clustering} n={nodes.length} bandwidth={bandWidth}></Dendogram>
     </div>
 {/if}
 <div>
