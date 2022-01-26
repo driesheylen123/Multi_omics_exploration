@@ -7,6 +7,7 @@
     import { links2Matrix, hclust, dendogram } from '../_js/functions.js';
 
     export let data = [];
+    export let bandwidth = 0;
     let nodes = [];
     let links = [];
     let matrix;
@@ -67,7 +68,7 @@
 
 
 <svg width="100%" viewBox={`0 0 ${width} ${height}`} bind:this={svg}>
-    <g bind:this={g_dendogram}>
+    <g transform={`translate(${bandwidth/2},0)`} bind:this={g_dendogram}>
         {#each clust_links as clust_link}
             <path d={link(clust_link.source, clust_link.target)}
                 fill="none"
