@@ -84,7 +84,7 @@
 
 </script>
 
-<svg width="100%" viewBox={`0 0 ${width} ${height}`} bind:this={svg}>
+<svg viewBox={`0 0 ${width} ${height}`} bind:this={svg}>
     <g transform={`translate(${margin.left}, ${margin.top})`}>
         <g class="edges" bind:this={g_element_links}>
             {#each links as link}

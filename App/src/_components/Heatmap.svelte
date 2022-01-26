@@ -8,11 +8,9 @@
     import { onMount } from 'svelte';
     import Dendogram from './Dendogram.svelte';
 
-
     // External JS
     import { colorScale } from '../_js/scales.js';
     import { brushFunction, links2Matrix, hclust, dendogram } from '../_js/functions';
-
     import { linkage } from '../stores.js';
    
     // Props
@@ -81,7 +79,7 @@
     </div>
 {/if}
 <div>
-    <svg width="100%" viewBox={`0 0 ${width} ${height}`} bind:this={svg}>
+    <svg viewBox={`0 0 ${width} ${height}`} bind:this={svg}>
         <g bind:this={g_heatmap}>
             {#each links as cell}
                 <rect x={colScale(cell.target.label)} 

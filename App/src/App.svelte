@@ -11,10 +11,10 @@
 <div class="d-flex flex-row flex-nowrap">
 	<Sidebar></Sidebar>
 	{#if $renderVisuals}
-		<div class="flex-grow-1 align-self-center mx-3 mh-100" id="heatmap">
+		<div class="flex-grow-1 align-self-center mx-3 my-3 mh-100" id="heatmap">
 			<Heatmap data={$_data}></Heatmap>
 		</div>
-		<div class="flex-grow-1 align-self-center mx-3 mh-100" id="network">
+		<div class="flex-grow-1 align-self-center mx-3 my-3 mh-100" id="network">
 			<Network data={$_data}></Network>
 		</div>
 	{/if}
