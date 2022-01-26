@@ -10,8 +10,8 @@
 
     // External JS
     import { colorScale } from '../_js/scales.js';
-    import { brushFunction, links2Matrix, hclust, dendogram } from '../_js/functions';
-    import { linkage } from '../stores.js';
+    import { brushFunction, links2Matrix, hclust, clusters, dendogram } from '../_js/functions';
+    import { linkage, threshold_clust, maxDepth } from '../stores.js';
    
     // Props
     export let data = [];
@@ -49,14 +49,16 @@
     }
 
     // Clustering
-    const h_clustering = {nodes: [], links: []};
+    const h_clustering = {nodes: [], links: [], clusters: []};
     $: {
         if ($linkage !== 'none') {
             let clustering = hclust(matrix, $linkage);
+            $maxDepth = clustering.root["depth"];
             let order = clustering.root.index;
             nodes.sort((a,b) => order.indexOf(a.id) - order.indexOf(b.id));
             h_clustering.nodes = clustering.root.descendants();
             h_clustering.links = dendogram(h_clustering.nodes).links;
+            h_clustering.clusters = clusters(clustering, $threshold_clust, nodes.length);
         } else {
             nodes.sort((a,b) => a.id - b.id);
         }

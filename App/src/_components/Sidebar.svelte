@@ -2,7 +2,7 @@
 import { element } from 'svelte/internal';
 
 
-    import { _data, threshold_edges, threshold_clust, radius, linkage, renderVisuals, simulationPause } from '../stores.js';
+    import { _data, threshold_edges, threshold_clust, maxDepth, radius, linkage, renderVisuals, simulationPause } from '../stores.js';
     const methods = ["none", "single", "complete", "average"];
     
     // Buttons
@@ -75,7 +75,7 @@ import { element } from 'svelte/internal';
         </div>
         <div class="mb-4">
             <label for="threshold_clust" class="form-label">Threshold clustering: {$threshold_clust}</label>
-            <input type="range" class="form-range" min="0" max="20" step="0.01" bind:value={$threshold_clust} id="threshold_clust">
+            <input type="range" class="form-range" min="0" max={$maxDepth} step="1" bind:value={$threshold_clust} id="threshold_clust">
         </div>
         <button type="button" class="btn btn-primary" bind:this={run_btn} on:click={eventHandler_runBtn} disabled>Run</button>
         <button type="button" class="btn btn-primary" bind:this={pause_btn} on:click={eventHandler_pauseBtn} disabled>Pause</button>
