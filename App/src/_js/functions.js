@@ -2,7 +2,7 @@ import { zoom } from 'd3-zoom';
 import { select, selectAll, filter, attr } from 'd3-selection';
 import { drag } from 'd3-drag';
 import { mean } from 'd3-array';
-import { toHighlight, nodeFilter, threshold_clust } from '../stores.js';
+import { toHighlight, nodeFilter } from '../stores.js';
 
 export function zoomFunction(w, h) {
 
@@ -102,9 +102,9 @@ export function dendogram(nodes) {
     }
 }
 
-export function clusters(nodes) {
-    const H_clusters = H.get_clusters(threshold_clust, "dist");
-    let I = Array.from({length: nodes.length});
+export function clusters(H, t, n) {
+    const H_clusters = H.get_clusters(t, "depth");
+    let I = Array.from({length: n});
     
     for (let cluster_index = 0; cluster_index < H_clusters.length; ++cluster_index) {
         H_clusters[cluster_index].forEach(({index}) => I[index] = cluster_index)
