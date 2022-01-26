@@ -26,7 +26,7 @@ The input data needs to be off the format `.json`, and contains the following ar
 ```
 
 #### R json formatter
-In R, the `jsonlite` library allows us to use the function `toJSON()` and `fromJSON` to parse JSON formats. Using `write_json(fromJSON(toJSON(df)), "C:/location/df.json")`, we can write any dataframe to `.json`. Here is an example of how to transform a correlation matrix into a node link diagram and store it as a `.json` file:
+In R, the `jsonlite` package allows us to use the function `toJSON()` and `fromJSON` to parse JSON formats. Using `write_json(fromJSON(toJSON(df)), "C:/location/df.json")`, we can write any dataframe to `.json`. Here is an example of how to transform a correlation matrix into a node link diagram and store it as a `.json` file:
 ```R
 # Load Data
 data(mtcars)
@@ -60,7 +60,32 @@ write_json(fromJSON(graph_json), "C:/location/example.json")
 ```
 
 #### Python json formatter
+In Python, we can use `pandas` to transform dataframes into [dictionaries](https://www.w3schools.com/python/python_dictionaries.asp), using `to_dict()`. Hence, `json` formats are easy to construct and can be stored in a local `.json` file using `json.dump()`. Here is an example of how to transform a correlation matrix into a node link diagram and store it as a `.json` file:
+```Python
+import pandas as pd
+import seaborn as sns
+import numpy as np
+import json
 
+# Load Data
+df = sns.load_dataset('iris')
+
+# Compute correlation matrix
+correlation_matrix = df[["sepal_length", "sepal_width", "petal_length", "petal_width"]].corr()
+
+# Generate edge list
+links = correlation_matrix.stack().reset_index()
+links.columns = ["source", "target", "value"]
+
+# Generate node list
+nodes = pd.DataFrame(data={'id': np.arange(len(correlation_matrix.columns), dtype=int), 'label': list(correlation_matrix.columns)})
+
+# Generate node link file
+graph = {'nodes': nodes.to_dict(orient='records'), 'links': links.to_dict(orient='records')}
+
+with open('example.json', 'w') as f:
+    json.dump(graph, f)
+```
 
 
 
