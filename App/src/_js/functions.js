@@ -1,7 +1,8 @@
 import { zoom } from 'd3-zoom';
 import { select, selectAll, filter, attr } from 'd3-selection';
 import { drag } from 'd3-drag';
-import { mean } from 'd3-array';
+import { mean, max } from 'd3-array';
+import { scaleLinear } from 'd3-scale';
 import { toHighlight, nodeFilter, threshold_clust } from '../stores.js';
 
 export function zoomFunction(w, h) {
@@ -113,35 +114,19 @@ export function clusters(nodes) {
     return I
 }
 
-// export function hclust(adjMatrix, linkage) {
-//     let matrix = druid.Matrix.from(adjMatrix);
-//     let H = new druid.Hierarchical_Clustering(matrix, linkage, "precomputed");
-//     let newOrder = H.root.index;
-//     let nodes = H.root.descendants();
-//     function createDendogram(nodes) {
-//         const leaves = nodes.filter(n => n.isLeaf);
-//         const links = [];
-//         leaves.forEach((node, i) => node.x = i)
-//         nodes.forEach((node, i) => {
-//             node.x = node.x ?? mean(node.leaves(), d => d.x);
-//             [node.left, node.right].forEach(child => {
-//             if (child) {
-//                 links.push({
-//                 "source": node,
-//                 "target": child
-//                 })
-//             }
-//             })
-//         })
-//         return {
-//             "nodes": nodes,
-//             "links": links,
-//         }
-//     }
-//     let dendogram = createDendogram(nodes);
-//     return {
-//         'order': newOrder,
-//         'dendogram': dendogram,
-//         'hclust_obj': H,
-//     }
-// }
+export function pathGenerator(link, nodes, n, w, h) {
+    const x = scaleLinear().domain([0, n]).range([0, w]);
+    const y = scaleLinear().domain([max(nodes, node => node["depth"]), 0]).range([0, h]).nice();
+    const x1 = x(link.source.x);
+    const y1 = y(link.source["depth"]);
+    const x2 = x(link.target.x);
+    const y2 = y(link.target["depth"]);
+    const max_radius = 20;
+    const x_dist = Math.abs(x1 - x2);
+    const y_dist = Math.abs(y1 - y2);
+    const radius = Math.min(x_dist, y_dist, max_radius);
+    const cx = x1 < x2 ? radius : -radius;
+    const counter_clockwise = cx < 0 ? 0 : 1;
+    const xa = x2 - cx;
+    return `M ${x1} ${y1} H ${xa} a ${radius} ${radius} 0 0 ${counter_clockwise} ${cx} ${radius} V ${y2}`;
+}
