@@ -6,6 +6,8 @@
     import { brush } from 'd3-brush';
     import { select } from 'd3-selection';
     import { onMount } from 'svelte';
+    import Dendogram from './Dendogram.svelte';
+
 
     // External JS
     import { colorScale } from '../_js/scales.js';
@@ -35,6 +37,7 @@
     const height = 500;
 
     // Scales
+    let bandWidth;
     const rowScale = scaleBand().range([0, height]);
     const colScale = scaleBand().range([0, width]);
     // Set Scale Domains
@@ -42,6 +45,7 @@
         if (nodes.length > 0) {
             rowScale.domain(nodes.map(d => d.label));
             colScale.domain(nodes.map(d => d.label));
+            bandWidth = colScale.bandwidth();
             colorScale.domain(extent(links.map(d => d.value)));
         }
     }
@@ -66,24 +70,28 @@
 		select(svg).call(brush().on("brush end", brushFunction(g_heatmap)));
 	});
 
-
-    
-
 </script>
 
-<svg width="100%" viewBox={`0 0 ${width} ${height}`} bind:this={svg}>
-    <g bind:this={g_heatmap}>
-        {#each links as cell}
-            <rect x={colScale(cell.target.label)} 
-                y={rowScale(cell.source.label)} 
-                width={colScale.bandwidth()-.5} 
-                height={rowScale.bandwidth()-.5}
-                fill={colorScale(cell.value)}
-                class="matrix-cell"
-                source={cell.source.label}
-                target={cell.target.label}>
-                <title> {`source: ${cell.source.label} - target: ${cell.target.label}`} </title>
-            </rect>
-        {/each}
-    </g>
-</svg>
+{#if $linkage !== "none"}
+    <div>
+        <Dendogram data={data} bandwidth={bandWidth}></Dendogram>
+    </div>
+{/if}
+<div>
+    <svg width="100%" viewBox={`0 0 ${width} ${height}`} bind:this={svg}>
+        <g bind:this={g_heatmap}>
+            {#each links as cell}
+                <rect x={colScale(cell.target.label)} 
+                    y={rowScale(cell.source.label)} 
+                    width={colScale.bandwidth()-.5} 
+                    height={rowScale.bandwidth()-.5}
+                    fill={colorScale(cell.value)}
+                    class="matrix-cell"
+                    source={cell.source.label}
+                    target={cell.target.label}>
+                    <title> {`source: ${cell.source.label} - target: ${cell.target.label}`} </title>
+                </rect>
+            {/each}
+        </g>
+    </svg>
+</div>
