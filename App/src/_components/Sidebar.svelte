@@ -1,9 +1,35 @@
 <script>
-import { element } from 'svelte/internal';
 
-
-    import { _data, threshold_edges, threshold_clust, maxDepth, radius, linkage, renderVisuals, simulationPause } from '../stores.js';
+    import { toggle_sidebar, _data, threshold_edges, edge_width, threshold_clust, color_method, color_scale_nodes, color_scale_edges, maxDepth, radius, linkage, renderVisuals, simulationPause } from '../stores.js';
+    import { onMount } from 'svelte';
+    
     const methods = ["none", "single", "complete", "average"];
+    const color_options = ["clusters", "variable", "none"];
+    const color_scales = ["scheme1", "scheme2", "scheme3"];
+
+    // Togglers
+    let root, expand_clust, expand_styling;
+	onMount(() => {
+		root = document.querySelector(":root");
+	})
+	function toggle_clust() {
+		if (!expand_clust) {
+			root.style.setProperty("--arrow-item-1-transformation", 'rotate(90deg)');
+			expand_clust = !expand_clust;
+		} else {
+			root.style.setProperty("--arrow-item-1-transformation", 'rotate(0)');
+			expand_clust = !expand_clust;
+		}
+	}
+	function toggle_styling() {
+		if (!expand_styling) {
+			root.style.setProperty("--arrow-item-2-transformation", 'rotate(90deg)');
+			expand_styling = !expand_styling;
+		} else {
+			root.style.setProperty("--arrow-item-2-transformation", 'rotate(0)');
+			expand_styling = !expand_styling;
+		}
+	}
     
     // Buttons
     let run_btn, pause_btn, reset_btn;    
@@ -26,6 +52,7 @@ import { element } from 'svelte/internal';
         reset_btn.disabled = true;
         $renderVisuals = false;
     }
+
     // Input File
     let file;
 	const reader = new FileReader()
@@ -47,58 +74,143 @@ import { element } from 'svelte/internal';
 
 </script>
 
-<div id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark">
-    <div class="d-flex align-items-center mb-3 mb-md-0 me-md-auto mt-4 display-6">
-        Network Brush
-    </div>
-    <hr>
-    <form class="mb-auto mt-4">
-        <div class="mb-4">
+<div class="bg-dark text-light" class:toggled={$toggle_sidebar} id="sidebar-wrapper">
+    <div class="sidebar-heading text-center py-4 fs-4 fw-bold border-bottom">Network Brush</div>
+    <div class="controls">
+        <div class="mt-4 mb-2 mx-3">
             <label for="formFile" class="form-label">Input File</label>
             <input class="form-control" type="file" bind:files={file} id="formFile" accept=".json">
         </div>
-        <div class="mb-4">
+        <div class="mt-4 mb-2 mx-3">
             <label for="threshold_edges" class="form-label">Threshold edges: {$threshold_edges}</label>
             <input type="range" class="form-range" min="0" max="1" step="0.01" bind:value={$threshold_edges} id="threshold_edges">
         </div>
-        <div class="mb-4">
-            <label for="node-radius" class="form-label">Node radius: {$radius}</label>
-            <input type="range" class="form-range" min="1" max="20" step="1" bind:value={$radius} id="node-radius">
-        </div>
-        <div class="mb-4">
-            <label for="clustering-method" class="form-label">Select Clustering</label>
-            <select bind:value={$linkage} class="form-select" id="clustering-method">
-                {#each methods as method}
-                    <option value={method}>{method}</option>
-                {/each}
-            </select>
-        </div>
-        <div class="mb-4">
-            <label for="threshold_clust" class="form-label">Threshold clustering: {$threshold_clust}</label>
-            <input type="range" class="form-range" min="0" max={$maxDepth} step="1" bind:value={$threshold_clust} id="threshold_clust">
-        </div>
-        <button type="button" class="btn btn-primary" bind:this={run_btn} on:click={eventHandler_runBtn} disabled>Run</button>
-        <button type="button" class="btn btn-primary" bind:this={pause_btn} on:click={eventHandler_pauseBtn} disabled>Pause</button>
-        <button type="button" class="btn btn-primary" bind:this={reset_btn} on:click={eventHandler_resetBtn} disabled>Reset</button>
-
-    </form>
-    <div>
-        <a href="#" class="text-white text-decoration-none">Documentation</a>
-    </div>
-    <hr>
-    <div class="dropdown">
-        <a href="https://github.com/" target="_blank" rel="noopener noreferrer" class="d-flex align-items-center text-white text-decoration-none">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-github me-2" viewBox="0 0 16 16">
-                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
-            </svg>
-            GitHub
-        </a>
-    </div>
+        <ul class="list-unstyled my-3">
+            <li class="ps-2 mb-1 item-1">
+                <button class="btn btn-toggle align-items-center rounded collapsed mb-2" data-bs-toggle="collapse" data-bs-target="#collapse-clustering" aria-expanded="false" aria-controls="collapse-clustering" on:click={toggle_clust}>
+                    Clustering
+                </button>
+                <div class="collapse" id="collapse-clustering">
+                    <div class="mb-2 mx-3">
+                        <label for="clustering-method" class="form-label">Select clustering</label>
+                        <select bind:value={$linkage} class="form-select" id="clustering-method">
+                            {#each methods as method}
+                                <option value={method}>{method}</option>
+                            {/each}
+                        </select>
+                    </div>
+                    <div class="mb-2 mx-3">
+                        <label for="threshold_clust" class="form-label">Threshold clustering: {$threshold_clust}</label>
+                        <input type="range" class="form-range" min="0" max={$maxDepth} step="1" bind:value={$threshold_clust} id="threshold_clust">    
+                    </div>
+                </div>
+            </li>
+            <li class="ps-2 mb-1 item-2">
+                <button class="btn btn-toggle align-items-center rounded collapsed mb-2" data-bs-toggle="collapse" data-bs-target="#collapse-styling" aria-expanded="false" aria-controls="collapse-styling" on:click={toggle_styling}>
+                    Styling
+                </button>
+                <div class="collapse" id="collapse-styling">
+                    <div class="mb-2 mx-3 fw-bold">Nodes</div>
+                    <div class="mb-2 mx-3">
+                        <label for="node-radius" class="form-label">Radius: {$radius}</label>
+                        <input type="range" class="form-range" min="1" max="20" step="1" bind:value={$radius} id="node-radius">
+                    </div>
+                    <div class="mb-2 mx-3">
+                        <label for="color-method" class="form-label">Color variable</label>
+                        <select bind:value={$color_method} class="form-select" id="color-method">
+                            {#each color_options as option}
+                                <option value={option}>{option}</option>
+                            {/each}
+                        </select>    
+                    </div>
+                    <div class="mb-2 mx-3">
+                        <label for="color-scale-nodes" class="form-label">Color scale</label>
+                        <select bind:value={$color_scale_nodes} class="form-select" id="color-scale-nodes">
+                            {#each color_scales as scale}
+                                <option value={scale}>{scale}</option>
+                            {/each}
+                        </select>
+                    </div>
+                    <div class="mt-3 mb-2 mx-3 fw-bold">Edges</div>
+                    <div class="mb-2 mx-3">
+                        <label for="edge-width" class="form-label">Width: {$edge_width}</label>
+                        <input type="range" class="form-range" min="1" max="10" step="1" bind:value={$edge_width} id="edge-width">
+                    </div>
+                    <div class="mb-2 mx-3">
+                        <label for="color-scale-edges" class="form-label">Color scale</label>
+                        <select bind:value={$color_scale_edges} class="form-select" id="color-scale-edges">
+                            {#each color_scales as scale}
+                                <option value={scale}>{scale}</option>
+                            {/each}
+                        </select>
+                    </div>
+                </div>
+            </li>
+            <div class="mt-3 mx-3">
+                <button type="button" class="btn btn-primary" bind:this={run_btn} on:click={eventHandler_runBtn} disabled>Run</button>
+                <button type="button" class="btn btn-primary" bind:this={pause_btn} on:click={eventHandler_pauseBtn} disabled>Pause</button>
+                <button type="button" class="btn btn-primary" bind:this={reset_btn} on:click={eventHandler_resetBtn} disabled>Reset</button>    
+            </div>
+        </ul>
+    </div> 
 </div>
 
 <style>
-    #sidebar {
-        width: 280px;
-        height: 100vh;
+    :root {
+        --arrow-item-1-transformation: rotate(0);
+        --arrow-item-2-transformation: rotate(0);
+    }
+    #sidebar-wrapper {
+        min-height: 100vh;
+        margin-left: -15rem;
+        -webkit-transition: margin 0.25s ease-out;
+        -moz-transition: margin 0.25s ease-out;
+        -o-transition: margin 0.25s ease-out;
+        transition: margin 0.25s ease-out;
+    }
+    #sidebar-wrapper .sidebar-heading {
+        padding: 0.875rem 1.25rem;
+        font-size: 1.2rem;
+    }
+    #sidebar-wrapper .controls {
+        width: 15rem;
+    }
+    #sidebar-wrapper.toggled {
+        margin-left: 0;
+    }
+    .btn-toggle {
+        display: inline-flex;
+        align-items: center;
+        padding: .25rem .5rem;
+        font-weight: 600;
+        color: rgb(255, 255, 255);
+        background-color: transparent;
+        border: 0;
+    }
+    .btn-toggle:hover,
+    .btn-toggle:focus {
+        color: rgb(255, 255, 255);
+        background-color: transparent;
+    }
+    .btn-toggle::before {
+        width: 1.25em;
+        line-height: 0;
+        content: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 14l6-6-6-6'/%3e%3c/svg%3e");
+        transition: transform .35s ease;
+        transform-origin: .5em 50%;
+    }
+    .item-1 .btn-toggle::before {
+        transform: var(--arrow-item-1-transformation);
+    }
+    .item-2 .btn-toggle::before {
+        transform: var(--arrow-item-2-transformation);
+    }
+    @media (min-width: 768px) {
+        #sidebar-wrapper {
+            margin-left: 0;
+        }
+        #sidebar-wrapper.toggled {
+            margin-left: -15rem;
+        }
     }
 </style>
