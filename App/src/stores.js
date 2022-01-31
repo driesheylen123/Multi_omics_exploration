@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+import * as cs from 'd3-scale-chromatic';
 
 export const toggle_sidebar = writable(false);
 export const _data = writable([]);
@@ -13,5 +14,6 @@ export const toHighlight = writable([]);
 export const nodeFilter = writable([]);
 export const color_method = writable();
 export const edge_width = writable();
+export const color_scales = writable(Object.keys(cs));
 export const color_scale_nodes = writable();
 export const color_scale_edges = writable();
