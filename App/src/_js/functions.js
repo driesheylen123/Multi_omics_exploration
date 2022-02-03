@@ -13,7 +13,10 @@ export function link_filter(links, t) {
     // Remove symmetric links
     links_filtered.forEach((el, i) => { el.referenceID = i });
     links_filtered.forEach((el, i, arr) => {
-        el.symmetricLink = arr.filter(k => k.source === el.target && k.target === el.source)[0].referenceID;
+        const symLink = arr.filter(k => k.source === el.target && k.target === el.source);
+        if (symLink.length != 0) {
+            el.symmetricLink = symLink[0].referenceID;
+        }
     });
     let toKeep = links_filtered.map(d => d.referenceID);
     links_filtered.forEach((el, i, nodes) => {
@@ -73,13 +76,13 @@ export function brushFunction(element) {
     return function brush({selection}) {
         if (selection) {
             let [[x0,y0],[x1,y1]] = selection;
-            const filter_function = (d, i, nodes) => (x0 <= nodes[i].attributes.x.value && nodes[i].attributes.x.value < x1 && y0 <= nodes[i].attributes.y.value && nodes[i].attributes.y.value < y1 || x0 <= (nodes[i].attributes.x.value + nodes[i].attributes.width.value) && nodes[i].attributes.x.value < x1 && y0 <= (nodes[i].attributes.y.value + nodes[i].attributes.height.value) && nodes[i].attributes.y.value < y1)
+            const filter_function = (d, i, nodes) => (x0 <= Number(nodes[i].attributes.x.value) && Number(nodes[i].attributes.x.value) < x1 && y0 <= Number(nodes[i].attributes.y.value) && Number(nodes[i].attributes.y.value) < y1 || x0 <= (Number(nodes[i].attributes.x.value) + Number(nodes[i].attributes.width.value)) && Number(nodes[i].attributes.x.value) < x1 && y0 <= (Number(nodes[i].attributes.y.value) + Number(nodes[i].attributes.height.value)) && Number(nodes[i].attributes.y.value) < y1)
             cells.filter((d, i, nodes) => !filter_function(d, i, nodes)).attr('opacity', .3);
             cells.filter((d, i, nodes) => filter_function(d, i, nodes)).attr('opacity', 1);    
             nodeFilter.set([...new Set(Array.from(cells.filter((d, i, nodes) => filter_function(d, i, nodes))).map(d => [d.attributes.source.value, d.attributes.target.value]).flat())]);
         } else {
             cells.attr('opacity', 1);
-            nodeFilter.set([...new Set(Array.from(cells).map(d => [d.attributes.source.value, d.attributes.target.value]).flat())]);
+            nodeFilter.set([]);
         }
     }
 }

@@ -15,11 +15,16 @@
     // Props
     export let nodes = [];
     export let links = [];
+    let nodesBrushed = [];
+    let linksBrushed = [];
 
     $: {
         if ($nodeFilter.length > 0) {
-            nodes = nodes.filter(d => $nodeFilter.includes(d.label));
-            links = links.filter(d => $nodeFilter.includes(d.source.label) && $nodeFilter.includes(d.target.label));
+            nodesBrushed = nodes.filter(d => $nodeFilter.includes(d.label));
+            linksBrushed = links.filter(d => $nodeFilter.includes(d.source.label) && $nodeFilter.includes(d.target.label));
+        } else {
+            nodesBrushed = nodes;
+            linksBrushed = links;
         }
     }
 
@@ -35,18 +40,17 @@
     const simulation = forceSimulation()
         .alphaTarget(0.02)   
         .alphaDecay(0.001)
-        // .velocityDecay(120/nodes_network.length - 0.08)
         .force('link', linkForce)
         .force('charge', forceManyBody())
         .force("collide", forceCollide())
         .force("center", forceCenter(width / 2, height / 2))
         .on('tick', () => {
-            nodes = nodes;
-            links = links;
+            nodesBrushed = nodesBrushed;
+            linksBrushed = linksBrushed;
         });
     $: {
-        simulation.nodes(nodes);
-        linkForce.links(links);
+        simulation.nodes(nodesBrushed);
+        linkForce.links(linksBrushed);
     }
 
     // Pause - Restart Simulation
@@ -70,10 +74,10 @@
 
 </script>
 
-<svg viewBox={`0 0 ${width} ${height}`} bind:this={svg}>
+<svg height="100%" viewBox={`0 0 ${width} ${height}`} bind:this={svg}>
     <g transform={`translate(${margin.left}, ${margin.top})`}>
         <g class="edges" bind:this={g_element_links}>
-            {#each links as link}
+            {#each linksBrushed as link}
                 <line class='link' 
                     x1={link.source.x} 
                     y1={link.source.y} 
@@ -85,7 +89,7 @@
             {/each}
         </g>
         <g class="nodes" bind:this={g_element_nodes}>
-            {#each nodes as node}
+            {#each nodesBrushed as node}
                 <!-- svelte-ignore a11y-mouse-events-have-key-events -->
                 <circle class='node' 
                         cx="{node.x}" 
@@ -106,7 +110,6 @@
 
 <style>
     .node {
-        /* fill: #000981ce; */
         stroke: #fff;
         stroke-width: .9px;
     }
