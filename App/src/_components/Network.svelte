@@ -5,23 +5,16 @@
     import { extent } from 'd3-array';
     import { select } from 'd3-selection';
     import { onMount } from 'svelte';
-    import { simulationPause, radius, toHighlight, nodeFilter } from "../stores";
+    import { simulationPause, radius, toHighlight, nodeFilter, edge_width } from "../stores";
 
+    // $: console.log($nodeFilter);
     // External JS
-    import { colorScale } from '../_js/scales.js';
+    import { colorScale_edges } from '../_js/scales.js';
     import { zoomFunction, dragFunction, highlight, fade } from '../_js/functions';
 
     // Props
-    export let data = [];
-
-    // Data handling
-    let nodes = [];
-    let links = [];
-    $: {
-        if (data.nodes) {
-            [nodes, links] = [data.nodes, data.links];
-        }
-    }
+    export let nodes = [];
+    export let links = [];
 
     $: {
         if ($nodeFilter.length > 0) {
@@ -36,13 +29,6 @@
     const margin = {top: 10, right: 20, bottom: 10, left: 20};
     const innerHeight = height - margin.top - margin.bottom;
     const innerWidth = width - margin.left - margin.right;
-
-    // Set Scale Domains
-    $: {
-        if (nodes.length > 0) {
-            colorScale.domain(extent(links.map(d => d.value)));
-        }
-    }
 
     // Simulation Forces
     const linkForce = forceLink().id(d => d.label);
@@ -93,7 +79,8 @@
                     y1={link.source.y} 
                     x2={link.target.x} 
                     y2={link.target.y} 
-                    stroke={colorScale(link.value)}
+                    stroke={colorScale_edges(link.value)}
+                    stroke-width={$edge_width}
                     opacity={$toHighlight.includes(link.source.label) || $toHighlight.includes(link.target.label) ? 1 : $toHighlight.length > 1 ? .5 : 1} />
             {/each}
         </g>
@@ -122,8 +109,5 @@
         /* fill: #000981ce; */
         stroke: #fff;
         stroke-width: .9px;
-    }
-    .edges {
-        stroke-width: 1px;
     }
 </style>

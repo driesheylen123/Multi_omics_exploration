@@ -9,44 +9,23 @@
     import Dendogram from './Dendogram.svelte';
 
     // External JS
-    import { colorScale } from '../_js/scales.js';
+    import { colorScale_edges } from '../_js/scales.js';
     import { brushFunction, links2Matrix, hclust, clusters, dendogram } from '../_js/functions';
     import { linkage, threshold_clust, maxDepth } from '../stores.js';
    
     // Props
-    export let data = [];
-
-    // Data handling
-    let nodes = [];
-    let links = [];
-    let matrix;
-    $: {
-        if (data.nodes) {
-            [nodes, links] = [data.nodes, data.links];
-            matrix = links2Matrix(nodes, links);
-            if (!nodes.id) {
-                nodes.forEach((element, index) => element.id = index );
-            }
-        }
-    }
+    export let nodes = [];
+    export let links = [];
+    let matrix = links2Matrix(nodes, links);
 
     // Dimensions
     const width = 500;
     const height = 500;
 
     // Scales
-    let bandWidth;
-    const rowScale = scaleBand().range([0, height]);
-    const colScale = scaleBand().range([0, width]);
-    // Set Scale Domains
-    $: {
-        if (nodes.length > 0) {
-            rowScale.domain(nodes.map(d => d.label));
-            colScale.domain(nodes.map(d => d.label));
-            bandWidth = colScale.bandwidth();
-            colorScale.domain(extent(links.map(d => d.value)));
-        }
-    }
+    const rowScale = scaleBand().domain(nodes.map(d => d.label)).range([0, height]);
+    const colScale = scaleBand().domain(nodes.map(d => d.label)).range([0, width]);
+    const bandWidth = colScale.bandwidth();
 
     // Clustering
     const h_clustering = {nodes: [], links: [], clusters: []};
@@ -84,15 +63,15 @@
     <svg viewBox={`0 0 ${width} ${height}`} bind:this={svg}>
         <g bind:this={g_heatmap}>
             {#each links as cell}
-                <rect x={colScale(cell.target.label)} 
-                    y={rowScale(cell.source.label)} 
+                <rect x={colScale(cell.target)} 
+                    y={rowScale(cell.source)} 
                     width={colScale.bandwidth()-.5} 
                     height={rowScale.bandwidth()-.5}
-                    fill={colorScale(cell.value)}
+                    fill={colorScale_edges(cell.value)}
                     class="matrix-cell"
-                    source={cell.source.label}
-                    target={cell.target.label}>
-                    <title> {`source: ${cell.source.label} - target: ${cell.target.label}`} </title>
+                    source={cell.source}
+                    target={cell.target}>
+                    <title> {`source: ${cell.source} - target: ${cell.target}`} </title>
                 </rect>
             {/each}
         </g>

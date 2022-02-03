@@ -9,13 +9,13 @@
     export let data = [];
     export let n;
     export let bandwidth = 0;
-    console.log(data);
 
     const width = 500; 
     const height = 200;
 
     const xScale = scaleLinear().domain([0, n]).range([0, width]);
-    const yScale = scaleLinear().domain([max(data.nodes, node => node["depth"]), 0]).range([0, height]).nice();
+    const yScale = scaleLinear().range([0, height]).nice();
+    $: yScale.domain([max(data.nodes, node => node["depth"]), 0])
     const c = scaleOrdinal(schemeDark2).domain(Array.from(new Set(data.clusters)));
     const c_value = (source) => {
                     const cluster_set = new Set(source.index.map(i => data.clusters[i]))

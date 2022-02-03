@@ -1,8 +1,8 @@
-import { writable } from 'svelte/store';
+import { writable, derived, get } from 'svelte/store';
 import * as cs from 'd3-scale-chromatic';
+import { link_filter } from './_js/functions';
 
-export const toggle_sidebar = writable(false);
-export const _data = writable([]);
+// Navigation
 export const threshold_edges = writable(.5);
 export const threshold_clust = writable(10);
 export const maxDepth = writable(10);
@@ -13,7 +13,35 @@ export const simulationPause = writable(false);
 export const toHighlight = writable([]);
 export const nodeFilter = writable([]);
 export const color_method = writable();
-export const edge_width = writable();
-export const color_scales = writable(Object.keys(cs));
+export const edge_width = writable(1);
+export const color_scales_nodes = writable(Object.keys(cs));
+export const color_scales_edges = writable(Object.keys(cs).filter(k => k.startsWith('interpolate')));
 export const color_scale_nodes = writable();
-export const color_scale_edges = writable();
+export const color_scale_edges = writable('interpolateRdBu');
+
+// Data
+export const toggle_sidebar = writable(false);
+export const _data = writable([]);
+export const nodes = derived(_data, ($_data) => {
+    if (!$_data.nodes) {
+        return [];
+    }
+    if (!$_data.nodes[0].id) {
+        $_data.nodes.forEach((element, index) => element.id = index);
+    }
+    return $_data.nodes.map(d => { return {label: d.label, id: d.id} });
+});
+export const links_network = derived([_data, threshold_edges], ([$_data, $threshold_edges]) => {
+    if (!$_data.links) {
+        return [];
+    }
+    const links = $_data.links.map(d => { return {source: d.source, target: d.target, value: d.value} });
+    return link_filter(links, $threshold_edges);
+});
+export const links_heatmap = derived(_data, ($_data) => {
+    if (!$_data.links) {
+        return [];
+    }
+    return $_data.links.map(d => { return {source: d.source, target: d.target, value: d.value} });
+});
+

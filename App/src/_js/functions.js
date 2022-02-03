@@ -4,6 +4,28 @@ import { drag } from 'd3-drag';
 import { mean } from 'd3-array';
 import { toHighlight, nodeFilter } from '../stores.js';
 
+export function link_filter(links, t) {
+    let links_filtered;
+    // Remove links beneath threshold
+    links_filtered = links.filter(k => Math.abs(k.value) >= t);
+    // Remove self links
+    links_filtered = links_filtered.filter(k => k.source !== k.target);
+    // Remove symmetric links
+    links_filtered.forEach((el, i) => { el.referenceID = i });
+    links_filtered.forEach((el, i, arr) => {
+        el.symmetricLink = arr.filter(k => k.source === el.target && k.target === el.source)[0].referenceID;
+    });
+    let toKeep = links_filtered.map(d => d.referenceID);
+    links_filtered.forEach((el, i, nodes) => {
+        if (toKeep.includes(el.referenceID)) {
+            toKeep = toKeep.filter(k => k !== el.symmetricLink);
+        }
+    });
+    links_filtered = links_filtered.filter(k => toKeep.includes(k.referenceID));
+    
+    return links_filtered;
+}
+
 export function zoomFunction(w, h) {
 
     function zoomed({transform}) {
@@ -57,7 +79,7 @@ export function brushFunction(element) {
             nodeFilter.set([...new Set(Array.from(cells.filter((d, i, nodes) => filter_function(d, i, nodes))).map(d => [d.attributes.source.value, d.attributes.target.value]).flat())]);
         } else {
             cells.attr('opacity', 1);
-            nodeFilter.set([]);
+            nodeFilter.set([...new Set(Array.from(cells).map(d => [d.attributes.source.value, d.attributes.target.value]).flat())]);
         }
     }
 }

@@ -1,6 +1,6 @@
 <script>
 
-    import { toggle_sidebar, _data, threshold_edges, edge_width, threshold_clust, color_scales, color_method, color_scale_nodes, color_scale_edges, maxDepth, radius, linkage, renderVisuals, simulationPause } from '../stores.js';
+    import { toggle_sidebar, _data, threshold_edges, edge_width, threshold_clust, color_scales_nodes, color_scales_edges, color_method, color_scale_nodes, color_scale_edges, maxDepth, radius, linkage, renderVisuals, simulationPause } from '../stores.js';
     import { onMount } from 'svelte';
     
     const methods = ["none", "single", "complete", "average"];
@@ -125,7 +125,7 @@
                     <div class="mb-2 mx-3">
                         <label for="color-scale-nodes" class="form-label">Color scale</label>
                         <select bind:value={$color_scale_nodes} class="form-select" id="color-scale-nodes">
-                            {#each $color_scales as scale}
+                            {#each $color_scales_nodes as scale}
                                 <option value={scale}>{scale}</option>
                             {/each}
                         </select>
@@ -138,7 +138,7 @@
                     <div class="mb-2 mx-3">
                         <label for="color-scale-edges" class="form-label">Color scale</label>
                         <select bind:value={$color_scale_edges} class="form-select" id="color-scale-edges">
-                            {#each $color_scales as scale}
+                            {#each $color_scales_edges as scale}
                                 <option value={scale}>{scale}</option>
                             {/each}
                         </select>

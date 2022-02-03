@@ -5,7 +5,7 @@
 	import Heatmap from './_components/Heatmap.svelte';
 	import Network from './_components/Network.svelte';
 
-	import { _data, renderVisuals } from './stores.js';
+	import { _data, nodes, links_heatmap, links_network, renderVisuals } from './stores.js';
 
 </script>
  
@@ -19,11 +19,11 @@
 				<div class="row my-5">
 					<div class="col-xl-6">
 						<h3 class="fs-4 mb-3">Adjacency Matrix</h3>
-						<Heatmap data={$_data}></Heatmap>
+						<Heatmap nodes={$nodes} links={$links_heatmap}></Heatmap>
 					</div>
 					<div class="col-xl-6">
 						<h3 class="fs-4 mb-3">Graph</h3>
-						<Network data={$_data}></Network>
+						<Network nodes={$nodes} links={$links_network}></Network>
 					</div>
 				</div>
 			{/if}
