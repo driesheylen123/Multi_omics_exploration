@@ -2,7 +2,7 @@ import { zoom } from 'd3-zoom';
 import { select, selectAll, filter, attr } from 'd3-selection';
 import { drag } from 'd3-drag';
 import { mean } from 'd3-array';
-import { toHighlight, nodeFilter } from '../stores.js';
+import { toHighlight, nodeFilter, simulationPause } from '../stores.js';
 
 export function link_filter(links, t) {
     let links_filtered;
@@ -41,6 +41,7 @@ export function zoomFunction(w, h) {
 
 export function dragFunction (node, simulation) {
 
+    simulationPause.set(false);
     function dragstarted(event) {
         if (!event.active) simulation.alphaTarget(0.3).restart();
         node.fx = event.subject.x;

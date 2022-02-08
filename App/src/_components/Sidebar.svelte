@@ -52,6 +52,15 @@
         $renderVisuals = false;
     }
 
+    $: {
+        if (pause_btn) {
+            if ($renderVisuals) {
+                pause_btn.disabled = $simulationPause ? true : false;
+                run_btn.disabled = $simulationPause ? false : true;
+            }
+        }
+    }
+
     // Input File
     let file;
 	const reader = new FileReader()
