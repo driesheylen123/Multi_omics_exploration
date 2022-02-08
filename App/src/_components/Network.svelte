@@ -5,11 +5,11 @@
     import { extent } from 'd3-array';
     import { select } from 'd3-selection';
     import { onMount } from 'svelte';
-    import { simulationPause, radius, toHighlight, nodeFilter, edge_width } from "../stores";
+    import { simulationPause, radius, toHighlight, nodeFilter, edge_width, color_method } from "../stores";
 
     // $: console.log($nodeFilter);
     // External JS
-    import { colorScale_edges } from '../_js/scales.js';
+    import { colorScale_edges, colorScale_nodes } from '../_js/scales.js';
     import { zoomFunction, dragFunction, highlight, fade } from '../_js/functions';
 
     // Props
@@ -95,7 +95,7 @@
                         cx="{node.x}" 
                         cy="{node.y}" 
                         r={$radius}
-                        fill={node.colour}
+                        fill={$color_method !== "fixed" ? colorScale_nodes(node.cluster) : "black"}
                         use:addNodeListeners={node}
                         on:mouseover={highlight(links, node)}
                         on:mouseout={fade}

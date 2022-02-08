@@ -1,9 +1,10 @@
 import { derived, get } from 'svelte/store';
-import { color_scales_edges, color_scale_edges } from '../stores.js';
-import { scaleDiverging } from 'd3-scale';
-import { interpolateBrBG, interpolatePRGn, interpolatePiYG, interpolatePuOr, interpolateRdBu, interpolateRdGy, interpolateRdYlBu, interpolateRdYlGn, interpolateSpectral, interpolateBuGn, interpolateBuPu, interpolateGnBu, interpolateOrRd, interpolatePuBuGn, interpolatePuBu, interpolatePuRd, interpolateRdPu, interpolateYlGnBu, interpolateYlGn, interpolateYlOrBr, interpolateYlOrRd, interpolateBlues, interpolateGreens, interpolateGreys, interpolatePurples, interpolateReds, interpolateOranges, interpolateCividis, interpolateCubehelixDefault, interpolateRainbow, interpolateWarm, interpolateCool, interpolateSinebow, interpolateTurbo, interpolateViridis, interpolateMagma, interpolateInferno, interpolatePlasma } from 'd3-scale-chromatic';
+import { color_scales_edges, color_scale_edges, maxDepth } from '../stores.js';
+import { scaleDiverging, scaleOrdinal } from 'd3-scale';
+import { schemeTableau10, interpolateBrBG, interpolatePRGn, interpolatePiYG, interpolatePuOr, interpolateRdBu, interpolateRdGy, interpolateRdYlBu, interpolateRdYlGn, interpolateSpectral, interpolateBuGn, interpolateBuPu, interpolateGnBu, interpolateOrRd, interpolatePuBuGn, interpolatePuBu, interpolatePuRd, interpolateRdPu, interpolateYlGnBu, interpolateYlGn, interpolateYlOrBr, interpolateYlOrRd, interpolateBlues, interpolateGreens, interpolateGreys, interpolatePurples, interpolateReds, interpolateOranges, interpolateCividis, interpolateCubehelixDefault, interpolateRainbow, interpolateWarm, interpolateCool, interpolateSinebow, interpolateTurbo, interpolateViridis, interpolateMagma, interpolateInferno, interpolatePlasma } from 'd3-scale-chromatic';
 
 export const colorScale_edges = scaleDiverging().domain([-1,0,1]).interpolator(interpolateRdBu);
+export const colorScale_nodes = scaleOrdinal().domain([...Array(maxDepth).keys()]).range(schemeTableau10);
 
 // export const colorScale_edges = derived(color_scale_edges, ($color_scale_edges) => {
     

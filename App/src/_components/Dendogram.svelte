@@ -10,6 +10,8 @@
     export let n;
     export let bandwidth = 0;
 
+    console.log(data);
+
     const width = 500; 
     const height = 200;
 

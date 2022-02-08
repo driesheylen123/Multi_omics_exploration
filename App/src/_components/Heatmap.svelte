@@ -33,11 +33,12 @@
         if ($linkage !== 'none') {
             let clustering = hclust(matrix, $linkage);
             $maxDepth = clustering.root["depth"];
-            let order = clustering.root.index;
-            nodes.sort((a,b) => order.indexOf(a.id) - order.indexOf(b.id));
             h_clustering.nodes = clustering.root.descendants();
             h_clustering.links = dendogram(h_clustering.nodes).links;
             h_clustering.clusters = clusters(clustering, $threshold_clust, nodes.length);
+            nodes.forEach((d, i) => d.cluster = h_clustering.clusters[i]);
+            let order = clustering.root.index;
+            nodes.sort((a,b) => order.indexOf(a.id) - order.indexOf(b.id));
         } else {
             nodes.sort((a,b) => a.id - b.id);
         }
@@ -59,7 +60,7 @@
         <Dendogram data={h_clustering} n={nodes.length} bandwidth={bandWidth}></Dendogram>
     </div>
 {/if}
-<div>
+<div class="mb-3">
     <svg viewBox={`0 0 ${width} ${height}`} bind:this={svg}>
         <g bind:this={g_heatmap}>
             {#each links as cell}

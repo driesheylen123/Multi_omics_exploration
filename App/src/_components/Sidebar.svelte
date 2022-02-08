@@ -4,7 +4,7 @@
     import { onMount } from 'svelte';
     
     const methods = ["none", "single", "complete", "average"];
-    const color_options = ["clusters", "variable", "none"];
+    const color_options = ["fixed", "clusters"];
 
     // Togglers
     let root, expand_clust, expand_styling;
@@ -131,27 +131,27 @@
                             {/each}
                         </select>    
                     </div>
-                    <div class="mb-2 mx-3">
+                    <!-- <div class="mb-2 mx-3">
                         <label for="color-scale-nodes" class="form-label">Color scale</label>
                         <select bind:value={$color_scale_nodes} class="form-select" id="color-scale-nodes">
                             {#each $color_scales_nodes as scale}
                                 <option value={scale}>{scale}</option>
                             {/each}
                         </select>
-                    </div>
+                    </div> -->
                     <div class="mt-3 mb-2 mx-3 fw-bold">Edges</div>
                     <div class="mb-2 mx-3">
                         <label for="edge-width" class="form-label">Width: {$edge_width}</label>
                         <input type="range" class="form-range" min="1" max="10" step="1" bind:value={$edge_width} id="edge-width">
                     </div>
-                    <div class="mb-2 mx-3">
+                    <!-- <div class="mb-2 mx-3">
                         <label for="color-scale-edges" class="form-label">Color scale</label>
                         <select bind:value={$color_scale_edges} class="form-select" id="color-scale-edges">
                             {#each $color_scales_edges as scale}
                                 <option value={scale}>{scale}</option>
                             {/each}
                         </select>
-                    </div>
+                    </div> -->
                 </div>
             </li>
             <div class="mt-3 mx-3">
