@@ -25,12 +25,10 @@
     "d3-array": "^3.1.1",
     "d3-axis": "^3.0.0",
     "d3-brush": "^3.0.0",
-    "d3-drag": "^3.0.0",
-    "d3-force": "^3.0.0",
     "d3-scale": "^4.0.2",
     "d3-scale-chromatic": "^3.0.0",
     "d3-selection": "^3.0.0",
-    "d3-zoom": "^3.0.0",
+    "force-graph": "^1.42.5",
     "sirv-cli": "^1.0.0"
   }
 }
