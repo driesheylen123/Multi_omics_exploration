@@ -1,10 +1,11 @@
 <script>
 
-    import { toggle_sidebar, _data, threshold_edges, edge_width, threshold_clust, color_scales_nodes, color_scales_edges, color_method, color_scale_nodes, color_scale_edges, maxDepth, radius, linkage, renderVisuals, simulationPause } from '../stores.js';
+    import { toggle_sidebar, _data, threshold_edges, edge_width, threshold_clust, node_variables, color_method, maxDepth, radius, linkage, renderVisuals, simulationPause } from '../stores.js';
     import { onMount } from 'svelte';
     
     const methods = ["none", "single", "complete", "average"];
-    const color_options = ["fixed", "clusters"];
+    let color_options = ["fixed", "clusters"];
+    $: color_options = ["fixed", "clusters", ...$node_variables];
 
     // Togglers
     let root, expand_clust, expand_styling;
@@ -144,6 +145,10 @@
                         <label for="edge-width" class="form-label">Width: {$edge_width}</label>
                         <input type="range" class="form-range" min="1" max="10" step="1" bind:value={$edge_width} id="edge-width">
                     </div>
+                    <!-- <div class="mt-4 mb-2 mx-3">
+                        <label for="color-scale-domain-edges" class="form-label">Threshold edges: {$color_scale_domain_edges}</label>
+                        <input type="range" class="form-range" min="-1" max="1" step="1" bind:value={$color_scale_domain_edges} id="color-scale-domain-edges">
+                    </div> -->
                     <!-- <div class="mb-2 mx-3">
                         <label for="color-scale-edges" class="form-label">Color scale</label>
                         <select bind:value={$color_scale_edges} class="form-select" id="color-scale-edges">

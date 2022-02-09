@@ -7,7 +7,7 @@ import { toHighlight, nodeFilter, simulationPause } from '../stores.js';
 export function link_filter(links, t) {
     let links_filtered;
     // Remove links beneath threshold
-    links_filtered = links.filter(k => Math.abs(k.value) >= t);
+    links_filtered = links[0].value ? links.filter(k => Math.abs(k.value) >= t) : links;
     // Remove self links
     links_filtered = links_filtered.filter(k => k.source !== k.target);
     // Remove symmetric links

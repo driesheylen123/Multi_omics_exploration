@@ -2,7 +2,6 @@
 
     // Dependencies
     import { scaleBand } from 'd3-scale';
-    import { extent } from 'd3-array';
     import { brush } from 'd3-brush';
     import { select } from 'd3-selection';
     import { onMount } from 'svelte';
@@ -68,7 +67,7 @@
                     y={rowScale(cell.source)} 
                     width={colScale.bandwidth()-.5} 
                     height={rowScale.bandwidth()-.5}
-                    fill={colorScale_edges(cell.value)}
+                    fill={cell.value ? colorScale_edges(cell.value) : "darkred"}
                     class="matrix-cell"
                     source={cell.source}
                     target={cell.target}>
