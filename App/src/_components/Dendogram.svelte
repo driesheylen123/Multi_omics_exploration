@@ -3,8 +3,8 @@
     import { pathGenerator } from '../_js/functions.js';
     import { max } from 'd3-array';
     import { scaleLinear, scaleOrdinal } from 'd3-scale';
-    import { schemeDark2 } from "d3-scale-chromatic";
-    import { threshold_clust } from "../stores.js";
+    import { schemeTableau10 } from "d3-scale-chromatic";
+    import { threshold_clust, maxDepth } from "../stores.js";
 
     export let data = [];
     export let n;
@@ -18,7 +18,8 @@
     const xScale = scaleLinear().domain([0, n]).range([0, width]);
     const yScale = scaleLinear().range([0, height]).nice();
     $: yScale.domain([max(data.nodes, node => node["depth"]), 0])
-    const c = scaleOrdinal(schemeDark2).domain(Array.from(new Set(data.clusters)));
+    // const c = scaleOrdinal(schemeTableau10).domain(Array.from(new Set(data.clusters)));
+    const c = scaleOrdinal().domain([...Array($maxDepth).keys()]).range(schemeTableau10)
     const c_value = (source) => {
                     const cluster_set = new Set(source.index.map(i => data.clusters[i]))
                     return cluster_set.size > 1 ? "grey" : c([...cluster_set.values()][0])
