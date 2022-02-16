@@ -1,16 +1,16 @@
 <script>
 
     // Dependencies
-    import { scaleBand } from 'd3-scale';
+    import { scaleBand, scaleDiverging } from 'd3-scale';
+    import { interpolateRdBu } from 'd3-scale-chromatic';
     import { brush } from 'd3-brush';
     import { select } from 'd3-selection';
     import { onMount } from 'svelte';
     import Dendogram from './Dendogram.svelte';
 
     // External JS
-    import { colorScale_edges } from '../_js/scales.js';
     import { brushFunction, links2Matrix, hclust, clusters, dendogram } from '../_js/functions';
-    import { linkage, threshold_clust, maxDepth } from '../stores.js';
+    import { domain_min, domain_center, domain_max, linkage, threshold_clust, maxDepth } from '../stores.js';
    
     // Props
     export let nodes = [];
@@ -25,6 +25,12 @@
     const rowScale = scaleBand().domain(nodes.map(d => d.label)).range([0, height]);
     const colScale = scaleBand().domain(nodes.map(d => d.label)).range([0, width]);
     const bandWidth = colScale.bandwidth();
+    const colorScale = scaleDiverging().interpolator(interpolateRdBu);
+
+    $: {
+        colorScale.domain([$domain_min, $domain_center, $domain_max]);
+        links = links;
+    }
 
     // Clustering
     const h_clustering = {nodes: [], links: [], clusters: []};
@@ -67,7 +73,7 @@
                     y={rowScale(cell.source)} 
                     width={colScale.bandwidth()-.5} 
                     height={rowScale.bandwidth()-.5}
-                    fill={cell.value ? colorScale_edges(cell.value) : "darkred"}
+                    fill={cell.value ? colorScale(cell.value) : "black"}
                     class="matrix-cell"
                     source={cell.source}
                     target={cell.target}>

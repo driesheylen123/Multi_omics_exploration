@@ -1,14 +1,20 @@
 <script>
 
-    import { toggle_sidebar, _data, threshold_edges, edge_width, threshold_clust, node_variables, color_method, maxDepth, radius, linkage, renderVisuals, simulationPause } from '../stores.js';
+    import { toggle_sidebar, _data, threshold_edges, edge_width, threshold_clust, node_variables, link_variables, color_method_nodes, color_method_edges, domain_min, domain_max, domain_center, maxDepth, radius, linkage, renderVisuals, simulationPause } from '../stores.js';
     import { onMount } from 'svelte';
+    import { interpolateRdBu } from "d3-scale-chromatic";
+    import { scaleDiverging } from 'd3-scale';
+    import { axisBottom } from 'd3-axis';
+    import { select } from "d3-selection"
     
     const methods = ["none", "single", "complete", "average"];
-    let color_options = ["fixed", "clusters"];
-    $: color_options = ["fixed", "clusters", ...$node_variables];
+    let color_options_nodes = ["fixed", "clusters"];
+    $: color_options_nodes = ["fixed", "clusters", ...$node_variables];
+    let color_options_edges = ["fixed"];
+    $: color_options_edges = ["fixed", ...$link_variables];
 
     // Togglers
-    let root, expand_clust, expand_styling;
+    let root, expand_clust, expand_styling_matrix, expand_styling_graph;
 	onMount(() => {
 		root = document.querySelector(":root");
 	})
@@ -21,13 +27,22 @@
 			expand_clust = !expand_clust;
 		}
 	}
-	function toggle_styling() {
-		if (!expand_styling) {
+	function toggle_styling_matrix() {
+		if (!expand_styling_matrix) {
 			root.style.setProperty("--arrow-item-2-transformation", 'rotate(90deg)');
-			expand_styling = !expand_styling;
+			expand_styling_matrix = !expand_styling_matrix;
 		} else {
 			root.style.setProperty("--arrow-item-2-transformation", 'rotate(0)');
-			expand_styling = !expand_styling;
+			expand_styling_matrix = !expand_styling_matrix;
+		}
+	}
+    function toggle_styling_graph() {
+		if (!expand_styling_graph) {
+			root.style.setProperty("--arrow-item-3-transformation", 'rotate(90deg)');
+			expand_styling_graph = !expand_styling_graph;
+		} else {
+			root.style.setProperty("--arrow-item-3-transformation", 'rotate(0)');
+			expand_styling_graph = !expand_styling_graph;
 		}
 	}
     
@@ -81,6 +96,12 @@
 		}
 	};
 
+    // let color_domain_axis;
+    // const colorScale = scaleDiverging().domain([-1,0,1]).interpolator(interpolateRdBu);
+    // onMount(() => {
+    //     select(color_domain_axis).call(axisBottom(colorScale));
+    // })
+
 </script>
 
 <div class="bg-dark text-light" class:toggled={$toggle_sidebar} id="sidebar-wrapper">
@@ -115,48 +136,69 @@
                 </div>
             </li>
             <li class="ps-2 mb-1 item-2">
-                <button class="btn btn-toggle align-items-center rounded collapsed mb-2" data-bs-toggle="collapse" data-bs-target="#collapse-styling" aria-expanded="false" aria-controls="collapse-styling" on:click={toggle_styling}>
-                    Styling
+                <button class="btn btn-toggle align-items-center rounded collapsed mb-2" data-bs-toggle="collapse" data-bs-target="#collapse-styling-matrix" aria-expanded="false" aria-controls="collapse-styling-matrix" on:click={toggle_styling_matrix}>
+                    Matrix Styling
                 </button>
-                <div class="collapse" id="collapse-styling">
+                <div class="collapse" id="collapse-styling-matrix">
+                    <div class="mb-2 mx-3 fw-bold">Domain colorscale</div>
+                    <div class="mb-2 mx-3">
+                        <label for="c-domain-min" class="form-label">Min: {$domain_min}</label>
+                        <input type="range" class="form-range" min="-1" max="0" step="0.01" bind:value={$domain_min} id="c-domain-min">    
+                    </div>
+                    <div class="mb-2 mx-3">
+                        <label for="c-domain-center" class="form-label">center: {$domain_center}</label>
+                        <input type="range" class="form-range" min={$domain_min} max={$domain_max} step="0.01" bind:value={$domain_center} id="c-domain-center">    
+                    </div>
+                    <div class="mb-2 mx-3">
+                        <label for="c-domain-max" class="form-label">Max: {$domain_max}</label>
+                        <input type="range" class="form-range" min="0" max="1" step="0.01" bind:value={$domain_max} id="c-domain-max">    
+                    </div>
+                    <div class="mb-2 mx-3">
+                        <svg width="100%" height={30}>
+                            <defs>
+                                <linearGradient id="linear-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color={interpolateRdBu(0)}></stop>
+                                    <stop offset="50%" stop-color={interpolateRdBu(0.5)}></stop>
+                                    <stop offset="100%" stop-color={interpolateRdBu(1)}></stop>
+                                </linearGradient>
+                            </defs>
+                            <rect width="100%" height="50%" fill="url(#linear-gradient)"></rect>
+                            <!-- <g class="axis" bind:this={color_domain_axis}></g> -->
+                        </svg>
+                    </div>
+                </div>
+            </li>
+            <li class="ps-2 mb-1 item-3">
+                <button class="btn btn-toggle align-items-center rounded collapsed mb-2" data-bs-toggle="collapse" data-bs-target="#collapse-styling-graph" aria-expanded="false" aria-controls="collapse-styling-graph" on:click={toggle_styling_graph}>
+                    Graph Styling
+                </button>
+                <div class="collapse" id="collapse-styling-graph">
                     <div class="mb-2 mx-3 fw-bold">Nodes</div>
                     <div class="mb-2 mx-3">
                         <label for="node-radius" class="form-label">Radius: {$radius}</label>
                         <input type="range" class="form-range" min="1" max="20" step="1" bind:value={$radius} id="node-radius">
                     </div>
                     <div class="mb-2 mx-3">
-                        <label for="color-method" class="form-label">Color variable</label>
-                        <select bind:value={$color_method} class="form-select" id="color-method">
-                            {#each color_options as option}
+                        <label for="color-method-nodes" class="form-label">Color variable</label>
+                        <select bind:value={$color_method_nodes} class="form-select" id="color-method-nodes">
+                            {#each color_options_nodes as option}
                                 <option value={option}>{option}</option>
                             {/each}
                         </select>    
                     </div>
-                    <!-- <div class="mb-2 mx-3">
-                        <label for="color-scale-nodes" class="form-label">Color scale</label>
-                        <select bind:value={$color_scale_nodes} class="form-select" id="color-scale-nodes">
-                            {#each $color_scales_nodes as scale}
-                                <option value={scale}>{scale}</option>
-                            {/each}
-                        </select>
-                    </div> -->
                     <div class="mt-3 mb-2 mx-3 fw-bold">Edges</div>
                     <div class="mb-2 mx-3">
                         <label for="edge-width" class="form-label">Width: {$edge_width}</label>
                         <input type="range" class="form-range" min="1" max="10" step="1" bind:value={$edge_width} id="edge-width">
                     </div>
-                    <!-- <div class="mt-4 mb-2 mx-3">
-                        <label for="color-scale-domain-edges" class="form-label">Threshold edges: {$color_scale_domain_edges}</label>
-                        <input type="range" class="form-range" min="-1" max="1" step="1" bind:value={$color_scale_domain_edges} id="color-scale-domain-edges">
-                    </div> -->
-                    <!-- <div class="mb-2 mx-3">
-                        <label for="color-scale-edges" class="form-label">Color scale</label>
-                        <select bind:value={$color_scale_edges} class="form-select" id="color-scale-edges">
-                            {#each $color_scales_edges as scale}
-                                <option value={scale}>{scale}</option>
+                    <div class="mb-2 mx-3">
+                        <label for="color-method-edges" class="form-label">Color variable</label>
+                        <select bind:value={$color_method_edges} class="form-select" id="color-method-edges">
+                            {#each color_options_edges as option}
+                                <option value={option}>{option}</option>
                             {/each}
-                        </select>
-                    </div> -->
+                        </select>    
+                    </div>
                 </div>
             </li>
             <div class="mt-3 mx-3">
@@ -172,6 +214,7 @@
     :root {
         --arrow-item-1-transformation: rotate(0);
         --arrow-item-2-transformation: rotate(0);
+        --arrow-item-3-transformation: rotate(0);
     }
     #sidebar-wrapper {
         min-height: 100vh;
@@ -218,6 +261,9 @@
     .item-2 .btn-toggle::before {
         transform: var(--arrow-item-2-transformation);
     }
+    .item-3 .btn-toggle::before {
+        transform: var(--arrow-item-3-transformation);
+    }
     @media (min-width: 768px) {
         #sidebar-wrapper {
             margin-left: 0;
@@ -225,5 +271,9 @@
         #sidebar-wrapper.toggled {
             margin-left: -15rem;
         }
+    }
+    .axis {
+        stroke: white;
+        fill: white;
     }
 </style>

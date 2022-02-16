@@ -4,13 +4,12 @@
     import { forceSimulation, forceLink, forceManyBody, forceCollide, forceCenter } from 'd3-force';
     import { min, max, extent } from 'd3-array';
     import { scaleSequential, scaleDiverging, scaleOrdinal } from 'd3-scale';
-    import { interpolateBlues, schemeTableau10, interpolateBrBG } from 'd3-scale-chromatic';
+    import { interpolateBlues, schemeTableau10, interpolateBrBG, interpolateRdBu } from 'd3-scale-chromatic';
     import { select } from 'd3-selection';
     import { onMount } from 'svelte';
-    import { simulationPause, radius, toHighlight, nodeFilter, edge_width, maxDepth, color_method } from "../stores";
+    import { domain_min, domain_center, domain_max, simulationPause, radius, toHighlight, nodeFilter, edge_width, maxDepth, color_method_nodes, color_method_edges } from "../stores";
 
     // External JS
-    import { colorScale_edges } from '../_js/scales.js';
     import { zoomFunction, dragFunction, highlight, fade } from '../_js/functions';
 
     // Props
@@ -37,6 +36,7 @@
     const innerWidth = width - margin.left - margin.right;
 
     // Define scales
+    const colorScale = scaleDiverging().interpolator(interpolateRdBu);
     const c_clusters = scaleOrdinal().range(schemeTableau10);
     const c_ordinal = scaleOrdinal().range(schemeTableau10);
     const c_linear = scaleSequential().interpolator(interpolateBlues);
@@ -48,25 +48,15 @@
         // clusters
         c_clusters.domain([...Array($maxDepth).keys()]);
         // variables
-        if (!($color_method === "fixed" || $color_method === "clusters")) {
-            values = [...new Set(nodes.map(d => d[$color_method]))];
+        if (!($color_method_nodes === "fixed" || $color_method_nodes === "clusters")) {
+            values = [...new Set(nodes.map(d => d[$color_method_nodes]))];
             c_ordinal.domain(values);
             c_linear.domain(extent(values));
             c_diverging.domain([min(values),0,max(values)]);
         }        
     }
-    const colorScale_nodes = (val, method) => {
-        if (method === "fixed") {
-            return "black"
-        } else if (method === "clusters") {
-            return c_clusters(val)
-        } else {
-            if (values.length > 10) {
-                return min(values) < 0 ? c_diverging(val) : c_linear(val);
-            } else {
-                return c_ordinal(val)
-            }
-        }
+    $: {
+        colorScale.domain([$domain_min, $domain_center, $domain_max]);
     }
 
     // Simulation Forces
@@ -117,7 +107,7 @@
                     y1={link.source.y} 
                     x2={link.target.x} 
                     y2={link.target.y} 
-                    stroke={link.value ? colorScale_edges(link.value) : "black"}
+                    stroke={$color_method_edges === "fixed" ? "black" : link.value ? colorScale(link.value) : "black"}
                     stroke-width={$edge_width}
                     opacity={$toHighlight.includes(link.source.label) || $toHighlight.includes(link.target.label) ? 1 : $toHighlight.length > 1 ? .5 : 1} />
             {/each}
@@ -129,12 +119,16 @@
                         cx="{node.x}" 
                         cy="{node.y}" 
                         r={$radius}
-                        fill={$color_method === "fixed" ? "black" : $color_method === "clusters" ? c_clusters(node.cluster) : typeof node[$color_method] === "string" ? c_ordinal(node[$color_method]) : c_linear(node[$color_method])}
+                        fill={$color_method_nodes === "fixed" ? "black" : $color_method_nodes === "clusters" ? c_clusters(node.cluster) : typeof node[$color_method_nodes] === "string" ? c_ordinal(node[$color_method_nodes]) : c_linear(node[$color_method_nodes])}
                         use:addNodeListeners={node}
                         on:mouseover={highlight(links, node)}
                         on:mouseout={fade}
                         opacity={$toHighlight.includes(node.label) ? 1 : $toHighlight.length > 0 ? 0.5 : 1} >
-                    <title>{node.label}</title>
+                    <title>{
+`label: ${node.label} 
+cluster: ${node.cluster}
+${$color_method_nodes}: ${node[$color_method_nodes]}`
+                    }</title>
                 </circle>     
             {/each}
         </g>

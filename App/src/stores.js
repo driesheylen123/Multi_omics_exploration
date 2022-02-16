@@ -2,7 +2,7 @@ import { writable, derived } from 'svelte/store';
 import { link_filter } from './_js/functions';
 
 // Navigation
-export const threshold_edges = writable(.5);
+export const threshold_edges = writable(0);
 export const threshold_clust = writable(10);
 export const maxDepth = writable(10);
 export const radius = writable(4);
@@ -11,10 +11,12 @@ export const renderVisuals = writable(false);
 export const simulationPause = writable(false);
 export const toHighlight = writable([]);
 export const nodeFilter = writable([]);
-export const color_method = writable();
+export const color_method_nodes = writable();
+export const color_method_edges = writable();
 export const edge_width = writable(1);
-export const color_scale_nodes = writable();
-export const color_scale_edges = writable('interpolateRdBu');
+export const domain_min = writable(-1);
+export const domain_center = writable(0);
+export const domain_max = writable(1);
 
 // Data
 export const toggle_sidebar = writable(false);
@@ -46,4 +48,10 @@ export const links_heatmap = derived(_data, ($_data) => {
         return [];
     }
     return $_data.links.map(d => { return {source: d.source, target: d.target, value: d.value} });
+});
+export const link_variables = derived(_data, ($_data) => {
+    if (!$_data.links) {
+        return [];
+    }
+    return Object.keys($_data.links[0]).filter(k => !(k === "source" || k === "target" || k === "referenceID" || k === "symmetricLink"))
 });
