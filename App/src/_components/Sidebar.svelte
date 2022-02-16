@@ -3,9 +3,6 @@
     import { toggle_sidebar, _data, threshold_edges, edge_width, threshold_clust, node_variables, link_variables, color_method_nodes, color_method_edges, domain_min, domain_max, domain_center, maxDepth, radius, linkage, renderVisuals, simulationPause } from '../stores.js';
     import { onMount } from 'svelte';
     import { interpolateRdBu } from "d3-scale-chromatic";
-    import { scaleDiverging } from 'd3-scale';
-    import { axisBottom } from 'd3-axis';
-    import { select } from "d3-selection"
     
     const methods = ["none", "single", "complete", "average"];
     let color_options_nodes = ["fixed", "clusters"];
@@ -96,12 +93,6 @@
 		}
 	};
 
-    // let color_domain_axis;
-    // const colorScale = scaleDiverging().domain([-1,0,1]).interpolator(interpolateRdBu);
-    // onMount(() => {
-    //     select(color_domain_axis).call(axisBottom(colorScale));
-    // })
-
 </script>
 
 <div class="bg-dark text-light" class:toggled={$toggle_sidebar} id="sidebar-wrapper">
@@ -116,7 +107,7 @@
             <input type="range" class="form-range" min="0" max="1" step="0.01" bind:value={$threshold_edges} id="threshold_edges">
         </div>
         <ul class="list-unstyled my-3">
-            <li class="ps-2 mb-1 item-1">
+            <li class="ps-2 mb-1 item-1 clustering-controls">
                 <button class="btn btn-toggle align-items-center rounded collapsed mb-2" data-bs-toggle="collapse" data-bs-target="#collapse-clustering" aria-expanded="false" aria-controls="collapse-clustering" on:click={toggle_clust}>
                     Clustering
                 </button>
@@ -135,26 +126,26 @@
                     </div>
                 </div>
             </li>
-            <li class="ps-2 mb-1 item-2">
+            <li class="ps-2 mb-1 item-2 matrix-styling">
                 <button class="btn btn-toggle align-items-center rounded collapsed mb-2" data-bs-toggle="collapse" data-bs-target="#collapse-styling-matrix" aria-expanded="false" aria-controls="collapse-styling-matrix" on:click={toggle_styling_matrix}>
                     Matrix Styling
                 </button>
                 <div class="collapse" id="collapse-styling-matrix">
                     <div class="mb-2 mx-3 fw-bold">Domain colorscale</div>
-                    <div class="mb-2 mx-3">
-                        <label for="c-domain-min" class="form-label">Min: {$domain_min}</label>
-                        <input type="range" class="form-range" min="-1" max="0" step="0.01" bind:value={$domain_min} id="c-domain-min">    
+                    <div class="mb-2 mx-3 domain-values-input">
+                        <label for="c-domain-min" class="form-label">min value</label>
+                        <input type="number" class="form-control" min="-1" max="0" step="0.01" bind:value={$domain_min} id="c-domain-min">    
                     </div>
-                    <div class="mb-2 mx-3">
-                        <label for="c-domain-center" class="form-label">center: {$domain_center}</label>
-                        <input type="range" class="form-range" min={$domain_min} max={$domain_max} step="0.01" bind:value={$domain_center} id="c-domain-center">    
+                    <div class="mb-2 mx-3 domain-values-input">
+                        <label for="c-domain-center" class="form-label">center value</label>
+                        <input type="number" class="form-control" min={$domain_min} max={$domain_max} step="0.01" bind:value={$domain_center} id="c-domain-center">    
                     </div>
-                    <div class="mb-2 mx-3">
-                        <label for="c-domain-max" class="form-label">Max: {$domain_max}</label>
-                        <input type="range" class="form-range" min="0" max="1" step="0.01" bind:value={$domain_max} id="c-domain-max">    
+                    <div class="mb-2 mx-3 domain-values-input">
+                        <label for="c-domain-max" class="form-label">max value</label>
+                        <input type="number" class="form-control" min="0" max="1" step="0.01" bind:value={$domain_max} id="c-domain-max">    
                     </div>
-                    <div class="mb-2 mx-3">
-                        <svg width="100%" height={30}>
+                    <div class="mb-2 mx-3 color-legend">
+                        <svg width="100%" height={50}>
                             <defs>
                                 <linearGradient id="linear-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
                                     <stop offset="0%" stop-color={interpolateRdBu(0)}></stop>
@@ -162,13 +153,27 @@
                                     <stop offset="100%" stop-color={interpolateRdBu(1)}></stop>
                                 </linearGradient>
                             </defs>
-                            <rect width="100%" height="50%" fill="url(#linear-gradient)"></rect>
-                            <!-- <g class="axis" bind:this={color_domain_axis}></g> -->
+                            <rect width="100%" height="30%" fill="url(#linear-gradient)"></rect>
+                            <g class="axis">
+                                <line class="domain" x1="0%" x2="100%"></line>
+                                <g class="tick tick-first" >
+                                    <line x1="0%" x2="0%" y1="0" y2="6"></line>
+                                    <text x="0%" y="11" dy="0.71em">{$domain_min}</text>
+                                </g>
+                                <g class="tick tick-middle" >
+                                    <line x1="50%" x2="50%" y1="0" y2="6"></line>
+                                    <text x="50%" y="11" dy="0.71em">{$domain_center}</text>
+                                </g>
+                                <g class="tick tick-last" >
+                                    <line x1="100%" x2="100%" y1="0" y2="6"></line>
+                                    <text x="100%" y="11" dy="0.71em">{$domain_max}</text>
+                                </g>
+                            </g>
                         </svg>
                     </div>
                 </div>
             </li>
-            <li class="ps-2 mb-1 item-3">
+            <li class="ps-2 mb-1 item-3 graph-styling">
                 <button class="btn btn-toggle align-items-center rounded collapsed mb-2" data-bs-toggle="collapse" data-bs-target="#collapse-styling-graph" aria-expanded="false" aria-controls="collapse-styling-graph" on:click={toggle_styling_graph}>
                     Graph Styling
                 </button>
@@ -273,7 +278,33 @@
         }
     }
     .axis {
+        transform: translate(0%, 40%);
+    }
+    .domain {
         stroke: white;
+        stroke-width: 1px;
+    }
+    .tick-first {
+        transform: translate(.5,0);
+    }
+    .tick-middle, .tick-last {
+        transform: translate(-.5,0);
+    }
+    .tick line {
+        stroke: white;
+        stroke-width: 1px;
+    }
+    .tick text {
         fill: white;
+        font-size: small;
+    }
+    .tick-first text {
+        text-anchor: start;
+    }
+    .tick-middle text {
+        text-anchor: middle;
+    }
+    .tick-last text {
+        text-anchor: end;
     }
 </style>

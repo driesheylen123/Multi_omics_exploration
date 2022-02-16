@@ -96,6 +96,16 @@
         }
     }
 
+    function toolTip (obj) {
+        let tooltip = '';
+        for (const [key, value] of Object.entries(obj)) {
+            if (!(key === 'index' || key === 'x' || key === 'y' || key === 'vx' || key === 'vy')) {
+               tooltip = tooltip + '\n' + `${key}: ${value}`;
+            }
+        }
+        return tooltip
+    }
+
 </script>
 
 <svg height="100%" viewBox={`0 0 ${width} ${height}`} bind:this={svg}>
@@ -124,11 +134,7 @@
                         on:mouseover={highlight(links, node)}
                         on:mouseout={fade}
                         opacity={$toHighlight.includes(node.label) ? 1 : $toHighlight.length > 0 ? 0.5 : 1} >
-                    <title>{
-`label: ${node.label} 
-cluster: ${node.cluster}
-${$color_method_nodes}: ${node[$color_method_nodes]}`
-                    }</title>
+                    <title>{toolTip(node)}</title>
                 </circle>     
             {/each}
         </g>
