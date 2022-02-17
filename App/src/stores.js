@@ -17,6 +17,9 @@ export const edge_width = writable(1);
 export const domain_min = writable(-1);
 export const domain_center = writable(0);
 export const domain_max = writable(1);
+export const transformX = writable(0);
+export const transformY = writable(0);
+export const transformK = writable(1);
 
 // Data
 export const toggle_sidebar = writable(false);

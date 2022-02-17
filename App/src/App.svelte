@@ -7,8 +7,6 @@
 
 	import { _data, nodes, links_heatmap, links_network, renderVisuals } from './stores.js';
 
-	$: console.log($_data);
-
 </script>
  
 <div class="d-flex" id="wrapper">

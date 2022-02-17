@@ -2,7 +2,8 @@ import { zoom } from 'd3-zoom';
 import { select, selectAll, filter, attr } from 'd3-selection';
 import { drag } from 'd3-drag';
 import { mean } from 'd3-array';
-import { toHighlight, nodeFilter, simulationPause } from '../stores.js';
+import { get } from 'svelte/store';
+import { toHighlight, nodeFilter, simulationPause, transformX, transformY, transformK } from '../stores.js';
 
 export function link_filter(links, t) {
     let links_filtered;
@@ -77,7 +78,7 @@ export function brushFunction(element) {
     return function brush({selection}) {
         if (selection) {
             let [[x0,y0],[x1,y1]] = selection;
-            const filter_function = (d, i, nodes) => (x0 <= Number(nodes[i].attributes.x.value) && Number(nodes[i].attributes.x.value) < x1 && y0 <= Number(nodes[i].attributes.y.value) && Number(nodes[i].attributes.y.value) < y1 || x0 <= (Number(nodes[i].attributes.x.value) + Number(nodes[i].attributes.width.value)) && Number(nodes[i].attributes.x.value) < x1 && y0 <= (Number(nodes[i].attributes.y.value) + Number(nodes[i].attributes.height.value)) && Number(nodes[i].attributes.y.value) < y1)
+            const filter_function = (d, i, nodes) => (x0 <= get(transformX) + (get(transformK)*Number(nodes[i].attributes.x.value)) && get(transformX) + (get(transformK)*(Number(nodes[i].attributes.x.value))) < x1 && y0 <= get(transformY) + (get(transformK)*(Number(nodes[i].attributes.y.value))) && get(transformY) + (get(transformK)*(Number(nodes[i].attributes.y.value))) < y1 || x0 <= get(transformX) + (get(transformK)*(Number(nodes[i].attributes.x.value) + Number(nodes[i].attributes.width.value))) && get(transformX) + (get(transformK)*(Number(nodes[i].attributes.x.value))) < x1 && y0 <= get(transformY) + (get(transformK)*(Number(nodes[i].attributes.y.value) + Number(nodes[i].attributes.height.value))) && get(transformY) + (get(transformK)*(Number(nodes[i].attributes.y.value))) < y1)
             cells.filter((d, i, nodes) => !filter_function(d, i, nodes)).attr('opacity', .3);
             cells.filter((d, i, nodes) => filter_function(d, i, nodes)).attr('opacity', 1);    
             nodeFilter.set([...new Set(Array.from(cells.filter((d, i, nodes) => filter_function(d, i, nodes))).map(d => [d.attributes.source.value, d.attributes.target.value]).flat())]);

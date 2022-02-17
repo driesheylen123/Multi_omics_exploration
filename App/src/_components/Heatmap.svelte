@@ -5,12 +5,13 @@
     import { interpolateRdBu } from 'd3-scale-chromatic';
     import { brush } from 'd3-brush';
     import { select } from 'd3-selection';
+    import { zoom } from 'd3-zoom';
     import { onMount } from 'svelte';
     import Dendogram from './Dendogram.svelte';
 
     // External JS
-    import { brushFunction, links2Matrix, hclust, clusters, dendogram } from '../_js/functions';
-    import { domain_min, domain_center, domain_max, linkage, threshold_clust, maxDepth } from '../stores.js';
+    import { zoomFunction, brushFunction, links2Matrix, hclust, clusters, dendogram } from '../_js/functions';
+    import { domain_min, domain_center, domain_max, transformX, transformY, transformK, linkage, threshold_clust, maxDepth } from '../stores.js';
    
     // Props
     export let nodes = [];
@@ -55,7 +56,14 @@
     // Binds
     let svg, g_heatmap;
     onMount(() => {
-		select(svg).call(brush().on("brush end", brushFunction(g_heatmap)));
+		select(svg).call(brush().filter(() => !event.shiftKey).on("brush end", brushFunction(g_heatmap)));
+        select(svg).call(zoom().filter(() => event.shiftKey).extent([[0, 0], [width, height]]).on('zoom', function({transform}) {
+            $transformX = transform.x;
+            $transformY = transform.y;
+            $transformK = transform.k;
+            select(this).select('g').attr("transform", transform);
+            select(svg).select('.selection')._groups[0][0].attributes.style.value = "display: none";
+        }));
 	});
 
 </script>
