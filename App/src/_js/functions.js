@@ -1,9 +1,10 @@
 import { zoom } from 'd3-zoom';
 import { select, selectAll, filter, attr } from 'd3-selection';
 import { drag } from 'd3-drag';
+import { brush } from 'd3-brush';
 import { mean } from 'd3-array';
 import { get } from 'svelte/store';
-import { toHighlight, nodeFilter, simulationPause, transformX, transformY, transformK } from '../stores.js';
+import { toHighlight, nodeFilter, simulationPause, transformX, transformY, transformK, maxDepth } from '../stores.js';
 
 export function link_filter(links, t) {
     let links_filtered;
@@ -30,18 +31,23 @@ export function link_filter(links, t) {
     return links_filtered;
 }
 
-export function zoomFunction(w, h) {
-
+export function zoomFunction(w, h, filter_function, storeParameters) {
     function zoomed({transform}) {
         select(this).select('g').attr("transform", transform);
+        if (storeParameters) {
+            transformX.set(transform.x);
+            transformY.set(transform.y);
+            transformK.set(transform.k);
+            select(this).select('.selection')._groups[0][0].attributes.style.value = "display: none";
+        }
     }
     return zoom()
+        .filter(filter_function)
         .extent([[0, 0], [w, h]])
         .on("zoom", zoomed);
 }
 
 export function dragFunction (node, simulation) {
-
     simulationPause.set(false);
     function dragstarted(event) {
         if (!event.active) simulation.alphaTarget(0.3).restart();
@@ -65,17 +71,15 @@ export function dragFunction (node, simulation) {
 
 export function highlight(data, self) {
     const current = self.label;
-    toHighlight.set([...new Set(data.filter(k => k.source.label === current || k.target.label === current).map(d => [d.source.label,d.target.label]).flat())]);
-    
+    toHighlight.set([...new Set(data.filter(k => k.source.label === current || k.target.label === current).map(d => [d.source.label,d.target.label]).flat())]); 
 }
 export function fade() {
     toHighlight.set([]);
 }
 
-export function brushFunction(element) {
-
+export function brushFunction(element, filter_function_brush) {
     const cells = select(element).selectAll('rect');
-    return function brush({selection}) {
+    function brushed({selection}) {
         if (selection) {
             let [[x0,y0],[x1,y1]] = selection;
             const filter_function = (d, i, nodes) => (x0 <= get(transformX) + (get(transformK)*Number(nodes[i].attributes.x.value)) && get(transformX) + (get(transformK)*(Number(nodes[i].attributes.x.value))) < x1 && y0 <= get(transformY) + (get(transformK)*(Number(nodes[i].attributes.y.value))) && get(transformY) + (get(transformK)*(Number(nodes[i].attributes.y.value))) < y1 || x0 <= get(transformX) + (get(transformK)*(Number(nodes[i].attributes.x.value) + Number(nodes[i].attributes.width.value))) && get(transformX) + (get(transformK)*(Number(nodes[i].attributes.x.value))) < x1 && y0 <= get(transformY) + (get(transformK)*(Number(nodes[i].attributes.y.value) + Number(nodes[i].attributes.height.value))) && get(transformY) + (get(transformK)*(Number(nodes[i].attributes.y.value))) < y1)
@@ -87,6 +91,9 @@ export function brushFunction(element) {
             nodeFilter.set([]);
         }
     }
+    return brush()
+        .filter(filter_function_brush)
+        .on("brush end", brushed);
 }
 
 export function links2Matrix(nodes, links) {
@@ -105,6 +112,7 @@ export function links2Matrix(nodes, links) {
 export function hclust(adjMatrix, linkage) {
     let matrix = druid.Matrix.from(adjMatrix);
     let H = new druid.Hierarchical_Clustering(matrix, linkage, "precomputed");
+    maxDepth.set(H.root["depth"])
     return H;
 }
 
@@ -125,7 +133,7 @@ export function dendogram(nodes) {
     })
     return {
         "nodes": nodes,
-        "links": links,
+        "links":links,
     }
 }
 
@@ -153,4 +161,14 @@ export function pathGenerator(link, x, y) {
     const counter_clockwise = cx < 0 ? 0 : 1;
     const xa = x2 - cx;
     return `M ${x1} ${y1} H ${xa} a ${radius} ${radius} 0 0 ${counter_clockwise} ${cx} ${radius} V ${y2}`;
+}
+
+export function toolTip (obj) {
+    let tooltip = '';
+    for (const [key, value] of Object.entries(obj)) {
+        if (!(key === 'index' || key === 'x' || key === 'y' || key === 'vx' || key === 'vy')) {
+           tooltip = tooltip + '\n' + `${key}: ${value}`;
+        }
+    }
+    return tooltip
 }
