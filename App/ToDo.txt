@@ -1,6 +1,0 @@
-To Do list for the Network Brush Svelte App
-----------------------------------------------
-
-1. Include Threshold filter for correlation networks
-2. Include node coloring (network) in SideBar: options: [fixed, value, clusters]
-4. Fix styling (wrapping) of components
