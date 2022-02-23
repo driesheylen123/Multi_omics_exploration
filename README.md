@@ -1,7 +1,10 @@
 # Network Brush
 A major problem within network visualization is the occurance of hairball like graphs, from which little to none information can be extracted. Network brush is a tool that allows you to dive deeper in big dense networks. Node link data is visualized both as an adjacency matrix and a traditional node link diagram. By adding a two dimensional brush on the adjacency matrix, this tool can be used to visualize smaller sub-graphs of the network, allowing the user to gain more insight in specific parts of the network.
 
-## Running the svelte app locally
+## Running the app online
+The application is available online, and can be accessed at: [](https://vercel.com).
+
+## Running the app locally
 This project is developped in the JavaScript framework [Svelte](https://svelte.dev). To run this application locally, clone the repository to a directory on your computer. *Note that you will need to have [Node.js](https://nodejs.org) installed.*
 
 1. Open the terminal/command promt on your pc.
