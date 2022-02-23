@@ -2,7 +2,7 @@
 
 ## Running the svelte app locally
 
-This project is developped in the JavaScript framework [Svelte](https://svelte.dev). To run this application locally, clone the repository to a directory on your computer. 
+This project is developped in the JavaScript framework [Svelte](https://svelte.dev). To run this application locally, clone the repository to a directory on your computer. *Note that you will need to have [Node.js](https://nodejs.org) installed.*
 
 1. Open the terminal/command promt on your pc.
 2. change the directory to the folder you want to store the application in.
@@ -26,5 +26,4 @@ npm install
 ```bash
 npm run dev
 ```
-*Note that you will need to have [Node.js](https://nodejs.org) installed.*
 7. Navigate to [localhost:5000](http://localhost:5000). You should now see the app running.
