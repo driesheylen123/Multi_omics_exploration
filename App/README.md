@@ -1,7 +1,7 @@
-# Network Brush
+## Running the app online
+The application is available online, and can be accessed at: [](https://vercel.com).
 
-## Running the svelte app locally
-
+## Running the app locally
 This project is developped in the JavaScript framework [Svelte](https://svelte.dev). To run this application locally, clone the repository to a directory on your computer. *Note that you will need to have [Node.js](https://nodejs.org) installed.*
 
 1. Open the terminal/command promt on your pc.
@@ -18,7 +18,7 @@ change the directory to the 'App' folder within the repository.
 ```bash
 cd Multi-Omics-Exploration-Tool\App
 ```
-5. Install all necessary dependencies. *Make sure [node](https://nodejs.org) is installed on your device*
+5. Install all necessary dependencies. *Make sure [Node.js](https://nodejs.org) is installed on your device*
 ```bash
 npm install
 ```
