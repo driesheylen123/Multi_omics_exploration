@@ -5,7 +5,7 @@
 	import Heatmap from './_components/Heatmap.svelte';
 	import Network from './_components/Network.svelte';
 
-	import { _data, nodes, links_heatmap, links_network, renderVisuals } from './stores.js';
+	import { nodes, links_heatmap, links_network, renderVisuals } from './stores.js';
 
 </script>
  

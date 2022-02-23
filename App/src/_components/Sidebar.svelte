@@ -4,7 +4,7 @@
     import { onMount } from 'svelte';
     import { interpolateRdBu } from "d3-scale-chromatic";
     
-    const methods = ["none", "single", "complete", "average"];
+    const cluster_methods = ["none", "single", "complete", "average"];
     let color_options_nodes = ["fixed", "clusters"];
     $: color_options_nodes = ["fixed", "clusters", ...$node_variables];
     let color_options_edges = ["fixed"];
@@ -79,7 +79,9 @@
 	const reader = new FileReader()
 	$: {
 		if (file) {
-			reader.readAsText(file[0]);
+            if (file.length > 0) {
+                reader.readAsText(file[0]);
+            }
 		}
 	}
 	reader.onload = function (event) {
@@ -115,7 +117,7 @@
                     <div class="mb-2 mx-3">
                         <label for="clustering-method" class="form-label">Select clustering</label>
                         <select bind:value={$linkage} class="form-select" id="clustering-method">
-                            {#each methods as method}
+                            {#each cluster_methods as method}
                                 <option value={method}>{method}</option>
                             {/each}
                         </select>
