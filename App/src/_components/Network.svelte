@@ -11,7 +11,7 @@
     // External JS
     import { simulationPause, radius, toHighlight, nodeFilter, edge_width, maxDepth, color_method_nodes, color_method_edges } from '../stores';
     import { zoomFunction, dragFunction, highlight, fade, toolTip } from '../_js/functions';
-    import { colorScale_edges } from '../_js/scales';
+    import { colorScale_edges, colorScale_clusters } from '../_js/scales';
 
     // Props
     export let nodes = [];
@@ -34,7 +34,6 @@
     const height = 500;
 
     // Define scales
-    const c_clusters = scaleOrdinal().range(schemeTableau10);
     const c_ordinal = scaleOrdinal().range(schemeTableau10);
     const c_linear = scaleSequential().interpolator(interpolateBlues);
     const c_diverging = scaleDiverging().interpolator(interpolateBrBG);
@@ -42,9 +41,6 @@
     // Scales -- reactive domains
     let values = [];
     $: {
-        // clusters
-        c_clusters.domain([...Array($maxDepth).keys()]);
-        // variables
         if (!($color_method_nodes === "fixed" || $color_method_nodes === "clusters")) {
             values = [...new Set(nodes.map(d => d[$color_method_nodes]))];
             c_ordinal.domain(values);
@@ -52,6 +48,7 @@
             c_diverging.domain([min(values),0,max(values)]);
         }        
     }
+    $: colorScale_clusters.domain([...Array($maxDepth).keys()]).unknown("grey");
 
     // Simulation Forces
     const linkForce = forceLink().id(d => d.label);
@@ -115,7 +112,7 @@
                         cx="{node.x}" 
                         cy="{node.y}" 
                         r={$radius}
-                        fill={$color_method_nodes === "fixed" ? "black" : $color_method_nodes === "clusters" ? c_clusters(node.cluster) : typeof node[$color_method_nodes] === "string" ? c_ordinal(node[$color_method_nodes]) : c_linear(node[$color_method_nodes])}
+                        fill={$color_method_nodes === "fixed" ? "black" : $color_method_nodes === "clusters" ? colorScale_clusters(node.cluster) : typeof node[$color_method_nodes] === "string" ? c_ordinal(node[$color_method_nodes]) : c_linear(node[$color_method_nodes])}
                         use:addNodeListeners={node}
                         on:mouseover={highlight(links, node)}
                         on:mouseout={fade}
