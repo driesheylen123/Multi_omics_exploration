@@ -10,8 +10,8 @@
     </div>
 
     <div class="d-flex align-items-center">
-        <a href="#" class="link-text me-3">Docs</a>
-        <a href="https://github.com/" target="_blank" rel="noopener noreferrer" class="d-flex align-items-center link-text">
+        <a href="https://github.com/driesheylen123/Multi_omics_exploration/blob/master/README.md" target="_blank" class="link-text me-3">Docs</a>
+        <a href="https://github.com/driesheylen123/Multi_omics_exploration" target="_blank" rel="noopener noreferrer" class="d-flex align-items-center link-text">
             <i class="fab fa-github"></i>
         </a>
     </div>
