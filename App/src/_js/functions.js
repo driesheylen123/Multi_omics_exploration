@@ -148,10 +148,10 @@ export function clusters(H, t, n) {
     return I
 }
 
-export function pathGenerator(link, x, y) {
-    const x1 = x(link.source.x);
+export function pathGenerator(link, x, y, tf_x, tf_k) {
+    const x1 = x(link.source.x * tf_k) + tf_x;
     const y1 = y(link.source["depth"]);
-    const x2 = x(link.target.x);
+    const x2 = x(link.target.x * tf_k) +tf_x;
     const y2 = y(link.target["depth"]);
     const max_radius = 20;
     const x_dist = Math.abs(x1 - x2);
@@ -166,7 +166,7 @@ export function pathGenerator(link, x, y) {
 export function toolTip (obj) {
     let tooltip = '';
     for (const [key, value] of Object.entries(obj)) {
-        if (!(key === 'index' || key === 'x' || key === 'y' || key === 'vx' || key === 'vy')) {
+        if (!(key === 'index' || key === 'x' || key === 'y' || key === 'vx' || key === 'vy' || key === 'fx' || key === 'fy')) {
            tooltip = tooltip + '\n' + `${key}: ${value}`;
         }
     }
