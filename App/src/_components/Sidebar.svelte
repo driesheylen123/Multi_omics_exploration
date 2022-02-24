@@ -98,7 +98,7 @@
 </script>
 
 <div class="bg-dark text-light" class:toggled={$toggle_sidebar} id="sidebar-wrapper">
-    <div class="sidebar-heading text-center py-4 fs-4 fw-bold border-bottom">Network Brush</div>
+    <div class="sidebar-heading text-center py-4 fs-4 fw-bold border-bottom">Multi-Omics Brush</div>
     <div class="controls">
         <div class="mt-4 mb-2 mx-3">
             <label for="formFile" class="form-label">Input File</label>
@@ -225,7 +225,7 @@
     }
     #sidebar-wrapper {
         min-height: 100vh;
-        margin-left: -15rem;
+        margin-left: -16rem;
         -webkit-transition: margin 0.25s ease-out;
         -moz-transition: margin 0.25s ease-out;
         -o-transition: margin 0.25s ease-out;
@@ -236,7 +236,7 @@
         font-size: 1.2rem;
     }
     #sidebar-wrapper .controls {
-        width: 15rem;
+        width: 16rem;
     }
     #sidebar-wrapper.toggled {
         margin-left: 0;
@@ -276,7 +276,7 @@
             margin-left: 0;
         }
         #sidebar-wrapper.toggled {
-            margin-left: -15rem;
+            margin-left: -16rem;
         }
     }
     .axis {
