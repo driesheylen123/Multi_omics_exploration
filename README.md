@@ -121,5 +121,5 @@ with open('example.json', 'w') as f:
 
 ## Examples
 #### Multi Omics Exploration
-* create an explorative view that will serve as a basis to identify potential disease-related medical parameters. 
+* Create an explorative view that will serve as a basis to identify potential disease-related medical parameters. 
 * Be a hypothesis-generating tool that is expected to provide input for (more directionality focused) downstream analyses
