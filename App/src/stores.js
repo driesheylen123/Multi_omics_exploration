@@ -39,12 +39,12 @@ export const node_variables = derived(_data, ($_data) => {
     }
     return Object.keys($_data.nodes[0]).filter(k => !(k === "label" || k === "id"))
 });
-export const links_network = derived([_data, threshold_edges], ([$_data, $threshold_edges]) => {
+export const links_network = derived(_data, ($_data) => {
     if (!$_data.links) {
         return [];
     }
     const links = $_data.links.map(d => { return {source: d.source, target: d.target, value: d.value} });
-    return link_filter(links, $threshold_edges);
+    return link_filter(links);
 });
 export const links_heatmap = derived(_data, ($_data) => {
     if (!$_data.links) {

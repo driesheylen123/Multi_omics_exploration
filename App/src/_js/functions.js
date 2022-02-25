@@ -1,17 +1,15 @@
 import { zoom } from 'd3-zoom';
-import { select, selectAll, filter, attr } from 'd3-selection';
+import { select, selectAll } from 'd3-selection';
 import { drag } from 'd3-drag';
 import { brush } from 'd3-brush';
 import { mean } from 'd3-array';
 import { get } from 'svelte/store';
 import { toHighlight, nodeFilter, simulationPause, transformX, transformY, transformK, maxDepth } from '../stores.js';
 
-export function link_filter(links, t) {
+export function link_filter(links) {
     let links_filtered;
-    // Remove links beneath threshold
-    links_filtered = links[0].value ? links.filter(k => Math.abs(k.value) >= t) : links;
     // Remove self links
-    links_filtered = links_filtered.filter(k => k.source !== k.target);
+    links_filtered = links.filter(k => k.source !== k.target);
     // Remove symmetric links
     links_filtered.forEach((el, i) => { el.referenceID = i });
     links_filtered.forEach((el, i, arr) => {

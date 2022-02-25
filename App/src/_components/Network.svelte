@@ -9,23 +9,26 @@
     import { onMount } from 'svelte';
 
     // External JS
-    import { simulationPause, radius, toHighlight, nodeFilter, edge_width, maxDepth, color_method_nodes, color_method_edges } from '../stores';
+    import { threshold_edges, simulationPause, radius, toHighlight, nodeFilter, edge_width, maxDepth, color_method_nodes, color_method_edges } from '../stores';
     import { zoomFunction, dragFunction, highlight, fade, toolTip } from '../_js/functions';
     import { colorScale_edges, colorScale_clusters } from '../_js/scales';
 
     // Props
     export let nodes = [];
     export let links = [];
+
     let nodesBrushed = [];
     let linksBrushed = [];
+    let links_filtered = [];
 
+    $: links_filtered = links[0].value ? links.filter(k => Math.abs(k.value) >= $threshold_edges) : links;
     $: {
         if ($nodeFilter.length > 0) {
             nodesBrushed = nodes.filter(d => $nodeFilter.includes(d.label));
-            linksBrushed = links.filter(d => $nodeFilter.includes(d.source.label) && $nodeFilter.includes(d.target.label));
+            linksBrushed = links_filtered.filter(d => $nodeFilter.includes(d.source.label) && $nodeFilter.includes(d.target.label));
         } else {
             nodesBrushed = nodes;
-            linksBrushed = links;
+            linksBrushed = links_filtered;
         }
     }
 
