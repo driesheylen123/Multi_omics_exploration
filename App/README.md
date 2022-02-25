@@ -24,6 +24,6 @@ npm install
 ```
 6. Run the application
 ```bash
-npm run dev
+npm run start
 ```
 7. Navigate to [localhost:5000](http://localhost:5000). You should now see the app running.
