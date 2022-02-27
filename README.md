@@ -8,7 +8,7 @@ rather than just looking at the overload of all interactions. An interface that 
 greatly helps in enabling comprehensible, detailed analyses.
 
 ## Running the app online
-The application is available online, and can be accessed at: [https://vercel.com](https://vercel.com).
+The application is available online, and can be accessed at: [https://mobs.vercel.app/](https://mobs.vercel.app/).
 
 ## Running the app locally
 This project is developped in the JavaScript framework [Svelte](https://svelte.dev). To run this application locally, clone the repository to a directory on your computer. *Note that you will need to have [Node.js](https://nodejs.org) installed.*
