@@ -1,5 +1,11 @@
-# Network Brush
-A major problem within network visualization is the occurance of hairball like graphs, from which little to none information can be extracted. Network brush is a tool that allows you to dive deeper in big dense networks. Node link data is visualized both as an adjacency matrix and a traditional node link diagram. By adding a two dimensional brush on the adjacency matrix, this tool can be used to visualize smaller sub-graphs of the network, allowing the user to gain more insight in specific parts of the network.
+# MOBS - Multi-Omics Brush for Subgraph visualisation
+One one of the big opportunities in multi-omics analysis is the identification of interactions between molecular entities and their
+association with diseases. In analyzing and expressing these interactions in the search for new hypotheses, multi-omics data
+is often either translated into matrices containing pairwise correlations and distances, or visualized as node-link diagrams. A
+major problem when visualizing large networks however is the occurrence of hairball-like graphs, from which little to none
+information can be extracted. It is of interest to investigate subgroups of markers that are closely associated with each other,
+rather than just looking at the overload of all interactions. An interface that draws subnetworks based on user interaction
+greatly helps in enabling comprehensible, detailed analyses.
 
 ## Running the app online
 The application is available online, and can be accessed at: [https://vercel.com](https://vercel.com).
