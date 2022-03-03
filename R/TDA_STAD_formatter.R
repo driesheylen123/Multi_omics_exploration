@@ -91,18 +91,18 @@ for (i in 1:length(sample_links_can$source)) {
 }
 for (i in 1:length(taxa_links_eucl$source)) {
   taxa_links_eucl$value[i] = eucl_dist_taxa[as.numeric(taxa_links_eucl$source[i]),as.numeric(taxa_links_eucl$target[i])]
-  taxa_links_eucl$source[i] = samples[as.numeric(taxa_links_eucl$source[i])]
-  taxa_links_eucl$target[i] = samples[as.numeric(taxa_links_eucl$target[i])]
+  taxa_links_eucl$source[i] = taxa[as.numeric(taxa_links_eucl$source[i])]
+  taxa_links_eucl$target[i] = taxa[as.numeric(taxa_links_eucl$target[i])]
 }
 for (i in 1:length(taxa_links_bray$source)) {
   taxa_links_bray$value[i] = bray_dist_taxa[as.numeric(taxa_links_bray$source[i]),as.numeric(taxa_links_bray$target[i])]
-  taxa_links_bray$source[i] = samples[as.numeric(taxa_links_bray$source[i])]
-  taxa_links_bray$target[i] = samples[as.numeric(taxa_links_bray$target[i])]
+  taxa_links_bray$source[i] = taxa[as.numeric(taxa_links_bray$source[i])]
+  taxa_links_bray$target[i] = taxa[as.numeric(taxa_links_bray$target[i])]
 }
 for (i in 1:length(taxa_links_can$source)) {
   taxa_links_can$value[i] = can_dist_taxa[as.numeric(taxa_links_can$source[i]),as.numeric(taxa_links_can$target[i])]
-  taxa_links_can$source[i] = samples[as.numeric(taxa_links_can$source[i])]
-  taxa_links_can$target[i] = samples[as.numeric(taxa_links_can$target[i])]
+  taxa_links_can$source[i] = taxa[as.numeric(taxa_links_can$source[i])]
+  taxa_links_can$target[i] = taxa[as.numeric(taxa_links_can$target[i])]
 }
 
 # Graph
